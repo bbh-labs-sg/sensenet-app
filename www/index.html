@@ -30,31 +30,25 @@
         <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; connect-src https://*">
         -->
 		<meta charset='utf-8' />
-        <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' http://*/* https://*/* ws://*/* wss://*/*; img-src 'self' data: http://* https://*">-->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: gap: https://ssl.gstatic.com 'unsafe-inline' 'unsafe-eval' http://*/* https://*/* ws://*/* wss://*/*; img-src 'self' data: blob: http://* https://*">
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-		<!--
-        <link rel="stylesheet" type="text/css" href="vendors/leaflet/leaflet.css">
-		<link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
-		-->
-		<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.4/mapbox-gl.css' rel='stylesheet' />
         <link rel="stylesheet" type="text/css" href="node_modules/chartist/dist/chartist.min.css">
+		<link rel="stylesheet" type="text/css" href="vendors/mapbox/mapbox-gl.css" />
+		<link rel="stylesheet" type="text/css" href="vendors/toastr/toastr.min.css" />
         <link rel="stylesheet" type="text/css" href="css/flex.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <title>SenseNet</title>
     </head>
     <body>
         <div id='root' class='flex'>
+			<h1>test</h1>
         </div>
 
 		<script type="text/javascript" src="vendors/jquery/jquery.min.js"></script>
-		<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.4/mapbox-gl.js'></script>
-		<!--
-		<script type="text/javascript" src="vendors/leaflet/leaflet.js"></script>
-		<script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
-		-->
-		<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+		<script type="text/javascript" src="vendors/toastr/toastr.min.js"></script>
+		<script type="text/javascript" src="vendors/mapbox/mapbox-gl.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/bundle.js"></script>
     </body>

@@ -1,7 +1,5 @@
-'use strict';
-
 // Toggle between Cordova and Web
-const CORDOVA = true;
+const CORDOVA = false;
 
 // React
 import React from 'react'
@@ -28,7 +26,6 @@ let pusher = null,
 import Chartist from 'chartist'
 
 // Mapbox
-//L.mapbox.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 
 const STATE_NOT_CONNECTED	= 0,
@@ -69,8 +66,8 @@ class App extends React.Component {
 			<div id='app' className='flex column one'>
 				{ user ? <Navbar /> : null }
 				{ user ? <Dashboard /> : <Authentication /> }
-				<DeviceManager ref='deviceManager' loggedIn={ !!this.state.user } />
-				<NetworkManager ref='networkManager' loggedIn={ !!this.state.user } />
+				<DeviceManager ref='deviceManager' loggedIn={ !!user } />
+				<NetworkManager ref='networkManager' loggedIn={ !!user } />
 			</div>
 		)
 	}
@@ -78,12 +75,13 @@ class App extends React.Component {
 		user: null,
 	}
 	componentDidMount() {
+		this.reloadCurrentUser();
+
 		if (CORDOVA) {
 			document.addEventListener('pause', this.onPause, false);
 			document.addEventListener('resume', this.onResume, false);
+			this.onResume();
 		}
-
-		this.reloadCurrentUser();
 
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload.type) {
@@ -134,7 +132,7 @@ class DeviceManager extends React.Component {
 		if (state == STATE_NOT_CONNECTED || state == STATE_NOT_FOUND) {
 			bluetoothSerial.list(this.onBluetoothListSuccess, this.onBluetoothListFailure);
 			this.setState({ deviceState: STATE_LISTING_DEVICES });
-			toastr.info('Looking for a SenseNet device..', { timeOut: 2000 });
+			toastr.info('Looking for a SenseNet device..', '', { timeOut: 2000 });
 		}
 	}
 	startLookForDevice = () => {
@@ -165,7 +163,7 @@ class DeviceManager extends React.Component {
 			}
 		}
 		this.setState({ deviceState: STATE_NOT_FOUND });
-		toastr.error('Couldn\'t find a SenseNet device', { timeOut: 3000 });
+		toastr.error('Couldn\'t find a SenseNet device', '', { timeOut: 3000 });
 	}
 	onBluetoothListFailure = () => {
 		this.setState({ deviceState: STATE_NOT_CONNECTED });
@@ -174,11 +172,11 @@ class DeviceManager extends React.Component {
 	onBluetoothConnectSuccess = () => {
 		this.setState({ deviceState: STATE_CONNECTED });
 		bluetoothSerial.subscribe('\r\n', this.onBluetoothDataSuccess, this.onBluetoothDataFailure);
-		toastr.success('Connected to a SenseNet device!', { timeOut: 3000 });
+		toastr.success('Connected to a SenseNet device!', '', { timeOut: 3000 });
 	}
 	onBluetoothConnectFailure = () => {
 		this.setState({ deviceState: STATE_NOT_CONNECTED });
-		toastr.error('Failed to connect the SenseNet device!', { timeOut: 3000 });
+		toastr.error('Failed to connect the SenseNet device!', '', { timeOut: 3000 });
 	}
 	onBluetoothDataSuccess = (rawData) => {
 		try {
@@ -200,7 +198,7 @@ class DeviceManager extends React.Component {
 		this.sendSensorReading(this.state.deviceID, this.data, position.coords);
 	}
 	onGetCurrentPositionError = (error) => {
-		toastr.error('Failed to get GPS position', { timeOut: 1000 });
+		toastr.error('Failed to get GPS position', '', { timeOut: 1000 });
 	}
 }
 
@@ -258,7 +256,7 @@ class NetworkManager extends React.Component {
 						// do nothing
 					},
 					error: (reading, error) => {
-						toastr.error('Failed to upload sensor readings.', { timeOut: 1000 });
+						toastr.error('Failed to upload sensor readings.', '', { timeOut: 1000 });
 					},
 				});
 			},
@@ -430,7 +428,7 @@ class Authentication extends React.Component {
 			error: (user, error) => {
 				dispatcher.dispatch({ type: 'reloadCurrentUser' });
 				this.setState({ signingUp: false });
-				toastr.error('Error: ' + error.code + ' ' + error.message, 'red white-text');
+				toastr.error('Error: ' + error.code + ' ' + error.message);
 			},
 		});
 	}
@@ -446,7 +444,7 @@ class Authentication extends React.Component {
 			},
 			error: (error) => {
 				this.setState({ resettingPassword: false });
-				toastr.error('Error: ' + error.code + ' ' + error.message, 'red white-text');
+				toastr.error('Error: ' + error.code + ' ' + error.message);
 			}
 		});
 	}
@@ -479,7 +477,7 @@ class Dashboard extends React.Component {
 				this.setState({ devices: results });
 			},
 			error: (error) => {
-				toastr.error('Failed to load devices!', { timeOut: 1000 });
+				toastr.error('Failed to load devices!', '', { timeOut: 1000 });
 			},
 		});
 
@@ -545,7 +543,7 @@ class MyDevice extends React.Component {
 		return (
 			<div className='flex one column sensenode z-depth-2'>
 				<h5>My SenseNode</h5>
-				<div className='ct-chart ct-golden-section' id={ this.readingID() }>
+				<div className='ct-chart ct-golden-section' id='my-device'>
 				</div>
 			</div>
 		)
@@ -559,13 +557,13 @@ class MyDevice extends React.Component {
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload.type) {
 			case 'sendSensorReading':
-				this.addReading(payload.reading);
+				this.addReading(payload);
 				break;
 			}
 		});
 
 		// Setup Chartist line graph
-		new Chartist.Line('#' + this.readingID(), {
+		new Chartist.Line('#my-device', {
 			labels: this.readingLabels(),
 			series: this.readingSeries(),
 		}, {
@@ -583,7 +581,7 @@ class MyDevice extends React.Component {
 		this.setState({ readings: readings });
 
 		// Update Chartist line graph
-		new Chartist.Line('#' + this.readingID(), {
+		new Chartist.Line('#my-device', {
 			labels: this.readingLabels(),
 			series: this.readingSeries(),
 		}, {
@@ -592,9 +590,6 @@ class MyDevice extends React.Component {
 				fillHoles: true,
 			}),
 		});
-	}
-	readingID = () => {
-		return 'reading-' + this.props.device.id;
 	}
 	readingLabels = () => {
 		return this.state.readings.map(function(r, i) {
@@ -793,7 +788,7 @@ class Settings extends React.Component {
 		let newPassword = this.refs.newPassword.value;
 		let confirmNewPassword = this.refs.confirmNewPassword.value;
 		if (newPassword !== confirmNewPassword) {
-			toastr.error('New password doesn\'t match confirmation password', { timeOut: 3000 });
+			toastr.error('New password doesn\'t match confirmation password', '', { timeOut: 3000 });
 			return;
 		}
 

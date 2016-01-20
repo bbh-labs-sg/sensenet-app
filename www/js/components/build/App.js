@@ -1,7 +1,5 @@
 'use strict';
 
-// Toggle between Cordova and Web
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _react = require('react');
@@ -38,7 +36,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var CORDOVA = true;
+// Toggle between Cordova and Web
+var CORDOVA = false;
 
 // React
 
@@ -61,7 +60,6 @@ var pusher = null,
 // Chartist
 
 // Mapbox
-//L.mapbox.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 
 var STATE_NOT_CONNECTED = 0,
@@ -143,8 +141,8 @@ var App = (function (_React$Component) {
 				{ id: 'app', className: 'flex column one' },
 				user ? _react2.default.createElement(Navbar, null) : null,
 				user ? _react2.default.createElement(Dashboard, null) : _react2.default.createElement(Authentication, null),
-				_react2.default.createElement(DeviceManager, { ref: 'deviceManager', loggedIn: !!this.state.user }),
-				_react2.default.createElement(NetworkManager, { ref: 'networkManager', loggedIn: !!this.state.user })
+				_react2.default.createElement(DeviceManager, { ref: 'deviceManager', loggedIn: !!user }),
+				_react2.default.createElement(NetworkManager, { ref: 'networkManager', loggedIn: !!user })
 			);
 		}
 	}, {
@@ -152,12 +150,13 @@ var App = (function (_React$Component) {
 		value: function componentDidMount() {
 			var _this3 = this;
 
+			this.reloadCurrentUser();
+
 			if (CORDOVA) {
 				document.addEventListener('pause', this.onPause, false);
 				document.addEventListener('resume', this.onResume, false);
+				this.onResume();
 			}
-
-			this.reloadCurrentUser();
 
 			this.listenerID = dispatcher.register(function (payload) {
 				switch (payload.type) {
@@ -193,7 +192,7 @@ var DeviceManager = (function (_React$Component2) {
 			if (state == STATE_NOT_CONNECTED || state == STATE_NOT_FOUND) {
 				bluetoothSerial.list(_this4.onBluetoothListSuccess, _this4.onBluetoothListFailure);
 				_this4.setState({ deviceState: STATE_LISTING_DEVICES });
-				toastr.info('Looking for a SenseNet device..', { timeOut: 2000 });
+				toastr.info('Looking for a SenseNet device..', '', { timeOut: 2000 });
 			}
 		}, _this4.startLookForDevice = function () {
 			if (!_this4.lookForDeviceIntervalID) {
@@ -220,17 +219,17 @@ var DeviceManager = (function (_React$Component2) {
 				}
 			}
 			_this4.setState({ deviceState: STATE_NOT_FOUND });
-			toastr.error('Couldn\'t find a SenseNet device', { timeOut: 3000 });
+			toastr.error('Couldn\'t find a SenseNet device', '', { timeOut: 3000 });
 		}, _this4.onBluetoothListFailure = function () {
 			_this4.setState({ deviceState: STATE_NOT_CONNECTED });
 			setTimeout(_this4.lookForDevice, 5000);
 		}, _this4.onBluetoothConnectSuccess = function () {
 			_this4.setState({ deviceState: STATE_CONNECTED });
 			bluetoothSerial.subscribe('\r\n', _this4.onBluetoothDataSuccess, _this4.onBluetoothDataFailure);
-			toastr.success('Connected to a SenseNet device!', { timeOut: 3000 });
+			toastr.success('Connected to a SenseNet device!', '', { timeOut: 3000 });
 		}, _this4.onBluetoothConnectFailure = function () {
 			_this4.setState({ deviceState: STATE_NOT_CONNECTED });
-			toastr.error('Failed to connect the SenseNet device!', { timeOut: 3000 });
+			toastr.error('Failed to connect the SenseNet device!', '', { timeOut: 3000 });
 		}, _this4.onBluetoothDataSuccess = function (rawData) {
 			try {
 				_this4.data = null;
@@ -244,7 +243,7 @@ var DeviceManager = (function (_React$Component2) {
 		}, _this4.onGetCurrentPositionSuccess = function (position) {
 			_this4.sendSensorReading(_this4.state.deviceID, _this4.data, position.coords);
 		}, _this4.onGetCurrentPositionError = function (error) {
-			toastr.error('Failed to get GPS position', { timeOut: 1000 });
+			toastr.error('Failed to get GPS position', '', { timeOut: 1000 });
 		}, _temp2), _possibleConstructorReturn(_this4, _ret2);
 	}
 
@@ -308,7 +307,7 @@ var NetworkManager = (function (_React$Component3) {
 							// do nothing
 						},
 						error: function error(reading, _error) {
-							toastr.error('Failed to upload sensor readings.', { timeOut: 1000 });
+							toastr.error('Failed to upload sensor readings.', '', { timeOut: 1000 });
 						}
 					});
 				},
@@ -501,7 +500,7 @@ var Authentication = (function (_React$Component4) {
 				error: function error(user, _error4) {
 					dispatcher.dispatch({ type: 'reloadCurrentUser' });
 					_this7.setState({ signingUp: false });
-					toastr.error('Error: ' + _error4.code + ' ' + _error4.message, 'red white-text');
+					toastr.error('Error: ' + _error4.code + ' ' + _error4.message);
 				}
 			});
 		}, _this7.resetPassword = function (event) {
@@ -516,7 +515,7 @@ var Authentication = (function (_React$Component4) {
 				},
 				error: function error(_error5) {
 					_this7.setState({ resettingPassword: false });
-					toastr.error('Error: ' + _error5.code + ' ' + _error5.message, 'red white-text');
+					toastr.error('Error: ' + _error5.code + ' ' + _error5.message);
 				}
 			});
 		}, _temp4), _possibleConstructorReturn(_this7, _ret4);
@@ -648,7 +647,7 @@ var Dashboard = (function (_React$Component5) {
 					_this9.setState({ devices: results });
 				},
 				error: function error(_error6) {
-					toastr.error('Failed to load devices!', { timeOut: 1000 });
+					toastr.error('Failed to load devices!', '', { timeOut: 1000 });
 				}
 			});
 
@@ -763,7 +762,7 @@ var MyDevice = (function (_React$Component8) {
 			_this12.setState({ readings: readings });
 
 			// Update Chartist line graph
-			new _chartist2.default.Line('#' + _this12.readingID(), {
+			new _chartist2.default.Line('#my-device', {
 				labels: _this12.readingLabels(),
 				series: _this12.readingSeries()
 			}, {
@@ -772,8 +771,6 @@ var MyDevice = (function (_React$Component8) {
 					fillHoles: true
 				})
 			});
-		}, _this12.readingID = function () {
-			return 'reading-' + _this12.props.device.id;
 		}, _this12.readingLabels = function () {
 			return _this12.state.readings.map(function (r, i) {
 				return i;
@@ -818,7 +815,7 @@ var MyDevice = (function (_React$Component8) {
 					null,
 					'My SenseNode'
 				),
-				_react2.default.createElement('div', { className: 'ct-chart ct-golden-section', id: this.readingID() })
+				_react2.default.createElement('div', { className: 'ct-chart ct-golden-section', id: 'my-device' })
 			);
 		}
 	}, {
@@ -831,13 +828,13 @@ var MyDevice = (function (_React$Component8) {
 			this.listenerID = dispatcher.register(function (payload) {
 				switch (payload.type) {
 					case 'sendSensorReading':
-						_this13.addReading(payload.reading);
+						_this13.addReading(payload);
 						break;
 				}
 			});
 
 			// Setup Chartist line graph
-			new _chartist2.default.Line('#' + this.readingID(), {
+			new _chartist2.default.Line('#my-device', {
 				labels: this.readingLabels(),
 				series: this.readingSeries()
 			}, {
@@ -990,7 +987,7 @@ var Settings = (function (_React$Component10) {
 			var newPassword = _this16.refs.newPassword.value;
 			var confirmNewPassword = _this16.refs.confirmNewPassword.value;
 			if (newPassword !== confirmNewPassword) {
-				toastr.error('New password doesn\'t match confirmation password', { timeOut: 3000 });
+				toastr.error('New password doesn\'t match confirmation password', '', { timeOut: 3000 });
 				return;
 			}
 
