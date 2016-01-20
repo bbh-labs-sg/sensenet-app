@@ -1,0 +1,31 @@
+{
+  "name": "sensenet_app",
+  "version": "0.0.1",
+  "description": "SenseNet client app for browsing and sending sensor data",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pollution",
+    "sensors",
+    "geolocation",
+    "iot"
+  ],
+  "author": "Jacky Boen",
+  "license": "GPL-2.0",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "chartist": "^0.9.5",
+    "flux": "^2.1.1",
+    "history": "^1.17.0",
+    "parse": "^1.6.14",
+    "pusher-js": "^3.0.0",
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6",
+    "react-router": "^1.0.3"
+  },
+  "dependencies": {}
+}
