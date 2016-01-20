@@ -1,6 +1,52 @@
 html, body, #root {
 	height: 100%;
 	margin: 0;
+	font-family: 'Open Sans', 'Helvetica', 'Arial', 'sans-serif';
+}
+
+a {
+	text-decoration: none;
+}
+
+.navbar {
+	background: #E82C0C;
+	color: white;
+}
+
+.navbar-menu-item a {
+	color: white;
+	margin-left: 16px;
+}
+
+.authentication,
+.settings {
+	width: 80%;
+	margin: 0 auto;
+}
+
+.authentication label {
+	margin: 0 16px;
+}
+
+.authentication input,
+.authentication button {
+	margin: 16px;
+	margin: 1rem;
+	padding: 16px;
+	padding: 1rem;
+}
+
+.settings input,
+.settings button {
+	margin: 16px 0;
+	margin: 1rem 0;
+	padding: 16px;
+	padding: 1rem;
+}
+
+.change-email,
+.change-password {
+	width: 100%;
 }
 
 .sensenode {

@@ -19,8 +19,7 @@ Parse.initialize(
 // Pusher
 import Pusher from 'pusher-js'
 let pusher = null,
-    channel = null,
-	presenceChannel = null;
+    channel = null;
 
 // Chartist
 import Chartist from 'chartist'
@@ -306,29 +305,6 @@ class NetworkManager extends React.Component {
 				reading: reading,
 			});
 		});
-
-		presenceChannel = pusher.subscribe('presence-client');
-		presenceChannel.bind('pusher:subscription_error', function(status) {
-			console.log('error:', status);
-		});
-		presenceChannel.bind('pusher:subscription_succeeded', function(members) {
-			dispatcher.dispatch({
-				type: 'presenceSubscribed',
-				members: members,
-			});
-		});
-		presenceChannel.bind('pusher:member_added', function(member) {
-			dispatcher.dispatch({
-				type: 'presenceAdded',
-				member: member,
-			});
-		});
-		presenceChannel.bind('pusher:member_removed', function(member) {
-			dispatcher.dispatch({
-				type: 'presenceRemoved',
-				member: member,
-			});
-		});
 	}
 	destroyPusher() {
 		if (pusher) {
@@ -340,49 +316,39 @@ class NetworkManager extends React.Component {
 			channel.unbind('pusher:subscription_error');
 			channel.unbind('client-reading');
 		}
-
-		if (presenceChannel) {
-			presenceChannel.unsubscribe('presence-client');
-			presenceChannel.unbind('pusher:subcription_succeeded');
-			presenceChannel.unbind('pusher:subcription_error');
-			presenceChannel.unbind('pusher:member_added');
-			presenceChannel.unbind('pusher:member_removed');
-		}
 	}
 }
 
 class Authentication extends React.Component {
 	render() {
 		return (
-			<div className='flex column'>
-				<div className='flex row'>
-					<form className='flex column one' action='#'>
-						<div className='flex row align-center justify-center'>
-							<h3>SenseNet</h3>
+			<div className='authentication flex column'>
+				<form className='flex column one' action='#'>
+					<div className='flex row align-center justify-center'>
+						<h3>SenseNet</h3>
+					</div>
+					<div className='flex column align-center justify-center'>
+						<div className='flex column one'>
+							<label htmlFor='email'>Email</label>
+							<input ref='email' id='email' type='email' />
 						</div>
-						<div className='flex row align-center justify-center'>
-							<div className='flex column one'>
-								<input ref='email' id='email' type='email' />
-								<label htmlFor='email'>Email</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='password' id='password' type='password' />
-								<label htmlFor='password'>Password</label>
-							</div>
+						<div className='flex column one'>
+							<label htmlFor='password'>Password</label>
+							<input ref='password' id='password' type='password' />
 						</div>
-						<div className='flex row align-center justify-center'>
-							<button onClick={this.login}>
-								{ this.state.loggingIn ? 'Logging In..' : 'Log In' }
-							</button>
-							<button onClick={this.signup}>
-								{ this.state.signingUp ? 'Signing Up..' : 'Sign Up' }
-							</button>
-							<button onClick={this.resetPassword}>
-								{ this.state.resettingPassword ? 'Resetting Password..' : 'Reset Password' }
-							</button>
-						</div>
-					</form>
-				</div>
+					</div>
+					<div className='flex row align-center justify-center'>
+						<button onClick={this.login}>
+							{ this.state.loggingIn ? 'Logging In..' : 'Log In' }
+						</button>
+						<button onClick={this.signup}>
+							{ this.state.signingUp ? 'Signing Up..' : 'Sign Up' }
+						</button>
+						<button onClick={this.resetPassword}>
+							{ this.state.resettingPassword ? 'Resetting Password..' : 'Reset Password' }
+						</button>
+					</div>
+				</form>
 			</div>
 		)
 	}
@@ -700,19 +666,19 @@ class Device extends React.Component {
 		};
 
 		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.temperature : 0;
+			return isValid(r, 'temperature') ? r.data.temperature : 0;
 		}));
 		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.humidity : 0;
+			return isValid(r, 'humidity') ? r.data.humidity : 0;
 		}));
 		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.carbonMonoxide * 0.1 : 0;
+			return isValid(r, 'carbonMonoxide') ? r.data.carbonMonoxide * 0.1 : 0;
 		}));
 		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.uv * 0.1 : 0;
+			return isValid(r, 'uv') ? r.data.uv * 0.1 : 0;
 		}));
 		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.particles * 0.1 : 0;
+			return isValid(r, 'particles') ? r.data.particles * 0.1 : 0;
 		}));
 
 		return series;
@@ -722,59 +688,55 @@ class Device extends React.Component {
 class Settings extends React.Component {
 	render() {
 		return (
-			<div className='flex column'>
-				<div className='flex row'>
-					<form className='flex column' action='#'>
-						<div className='flex row align-center justify-center'>
-							<h3>Change Email</h3>
+			<div className='settings flex column align-center'>
+				<form className='change-email flex column one' action='#'>
+					<div className='flex row align-center justify-center'>
+						<h3>Change Email</h3>
+					</div>
+					<div className='flex column'>
+						<div className='flex column'>
+							<label htmlFor='old-email'>Old Email</label>
+							<input ref='oldEmail' id='old-email' type='email' className='validate' />
 						</div>
-						<div className='flex row'>
-							<div className='flex column one'>
-								<input ref='oldEmail' id='old-email' type='email' className='validate' />
-								<label htmlFor='old-email'>Old Email</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='newEmail' id='new-email' type='email' className='validate' />
-								<label htmlFor='new-email'>New Email</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='password' id='password' type='password' className='validate' />
-								<label htmlFor='password'>Password</label>
-							</div>
-							<button onClick={this.changeEmail}>
-								{ this.state.changingEmail ? 'Submitting..' : 'Submit' }
-							</button>
+						<div className='flex column'>
+							<label htmlFor='new-email'>New Email</label>
+							<input ref='newEmail' id='new-email' type='email' className='validate' />
 						</div>
-					</form>
-				</div>
-				<div className='flex row'>
-					<form className='flex column one' action='#'>
-						<div className='flex row align-center justify-center'>
-							<h3>Change Password</h3>
+						<div className='flex column'>
+							<label htmlFor='password'>Password</label>
+							<input ref='password' id='password' type='password' className='validate' />
 						</div>
-						<div className='flex row'>
-							<div className='flex column one'>
-								<input ref='email' id='email' type='email' className='validate' />
-								<label htmlFor='email'>Email</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='oldPassword' id='old-password' type='password' className='validate' />
-								<label htmlFor='old-password'>Old Password</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='newPassword' id='new-password' type='password' className='validate' />
-								<label htmlFor='new-password'>New Password</label>
-							</div>
-							<div className='flex column one'>
-								<input ref='confirmNewPassword' id='confirm-new-password' type='password' className='validate' />
-								<label htmlFor='confirm-new-password'>Confirm New Password</label>
-							</div>
-							<button onClick={this.changePassword}>
-								{ this.state.changingPassword ? 'Submitting..' : 'Submit' }
-							</button>
+						<button onClick={this.changeEmail}>
+							{ this.state.changingEmail ? 'Submitting..' : 'Submit' }
+						</button>
+					</div>
+				</form>
+				<form className='change-password flex column one' action='#'>
+					<div className='flex row align-center justify-center'>
+						<h3>Change Password</h3>
+					</div>
+					<div className='flex column'>
+						<div className='flex column'>
+							<label htmlFor='email'>Email</label>
+							<input ref='email' id='email' type='email' className='validate' />
 						</div>
-					</form>
-				</div>
+						<div className='flex column'>
+							<label htmlFor='old-password'>Old Password</label>
+							<input ref='oldPassword' id='old-password' type='password' className='validate' />
+						</div>
+						<div className='flex column'>
+							<label htmlFor='new-password'>New Password</label>
+							<input ref='newPassword' id='new-password' type='password' className='validate' />
+						</div>
+						<div className='flex column'>
+							<label htmlFor='confirm-new-password'>Confirm New Password</label>
+							<input ref='confirmNewPassword' id='confirm-new-password' type='password' className='validate' />
+						</div>
+						<button onClick={this.changePassword}>
+							{ this.state.changingPassword ? 'Submitting..' : 'Submit' }
+						</button>
+					</div>
+				</form>
 			</div>
 		)
 	}
@@ -809,11 +771,11 @@ class Navbar extends React.Component {
 	render() {
 		return (
 			<nav className='navbar'>
-				<ul className='menu'>
-					<li><a href='#' onClick={goto.bind(null, 'overview')}>Overview</a></li>
-					<li><a href='#' onClick={goto.bind(null, 'devices')}>Devices</a></li>
-					<li><a href='#' onClick={goto.bind(null, 'settings')}>Settings</a></li>
-					<li><a href='#' onClick={this.logout}>Log Out</a></li>
+				<ul className='navbar-menu flex row'>
+					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'overview')}>Overview</a></li>
+					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'devices')}>Devices</a></li>
+					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'settings')}>Settings</a></li>
+					<li className='flex navbar-menu-item'><a href='#' onClick={this.logout}>Log Out</a></li>
 				</ul>
 			</nav>
 		)

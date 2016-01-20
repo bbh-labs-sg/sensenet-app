@@ -54,8 +54,7 @@ _parse2.default.initialize('9sMhGuNUapuBzG4HePZSNUmfRyDegxsXXoAjttUk', // Applic
 // Pusher
 
 var pusher = null,
-    channel = null,
-    presenceChannel = null;
+    channel = null;
 
 // Chartist
 
@@ -399,29 +398,6 @@ var NetworkManager = (function (_React$Component3) {
 					reading: reading
 				});
 			});
-
-			presenceChannel = pusher.subscribe('presence-client');
-			presenceChannel.bind('pusher:subscription_error', function (status) {
-				console.log('error:', status);
-			});
-			presenceChannel.bind('pusher:subscription_succeeded', function (members) {
-				dispatcher.dispatch({
-					type: 'presenceSubscribed',
-					members: members
-				});
-			});
-			presenceChannel.bind('pusher:member_added', function (member) {
-				dispatcher.dispatch({
-					type: 'presenceAdded',
-					member: member
-				});
-			});
-			presenceChannel.bind('pusher:member_removed', function (member) {
-				dispatcher.dispatch({
-					type: 'presenceRemoved',
-					member: member
-				});
-			});
 		}
 	}, {
 		key: 'destroyPusher',
@@ -434,14 +410,6 @@ var NetworkManager = (function (_React$Component3) {
 				channel.unsubscribe('private-client-reading');
 				channel.unbind('pusher:subscription_error');
 				channel.unbind('client-reading');
-			}
-
-			if (presenceChannel) {
-				presenceChannel.unsubscribe('presence-client');
-				presenceChannel.unbind('pusher:subcription_succeeded');
-				presenceChannel.unbind('pusher:subcription_error');
-				presenceChannel.unbind('pusher:member_added');
-				presenceChannel.unbind('pusher:member_removed');
 			}
 		}
 	}]);
@@ -526,64 +494,60 @@ var Authentication = (function (_React$Component4) {
 		value: function render() {
 			return _react2.default.createElement(
 				'div',
-				{ className: 'flex column' },
+				{ className: 'authentication flex column' },
 				_react2.default.createElement(
-					'div',
-					{ className: 'flex row' },
+					'form',
+					{ className: 'flex column one', action: '#' },
 					_react2.default.createElement(
-						'form',
-						{ className: 'flex column one', action: '#' },
+						'div',
+						{ className: 'flex row align-center justify-center' },
+						_react2.default.createElement(
+							'h3',
+							null,
+							'SenseNet'
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'flex column align-center justify-center' },
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row align-center justify-center' },
+							{ className: 'flex column one' },
 							_react2.default.createElement(
-								'h3',
-								null,
-								'SenseNet'
-							)
+								'label',
+								{ htmlFor: 'email' },
+								'Email'
+							),
+							_react2.default.createElement('input', { ref: 'email', id: 'email', type: 'email' })
 						),
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row align-center justify-center' },
+							{ className: 'flex column one' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'email', id: 'email', type: 'email' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'email' },
-									'Email'
-								)
+								'label',
+								{ htmlFor: 'password' },
+								'Password'
 							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'password', id: 'password', type: 'password' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'password' },
-									'Password'
-								)
-							)
+							_react2.default.createElement('input', { ref: 'password', id: 'password', type: 'password' })
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'flex row align-center justify-center' },
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.login },
+							this.state.loggingIn ? 'Logging In..' : 'Log In'
 						),
 						_react2.default.createElement(
-							'div',
-							{ className: 'flex row align-center justify-center' },
-							_react2.default.createElement(
-								'button',
-								{ onClick: this.login },
-								this.state.loggingIn ? 'Logging In..' : 'Log In'
-							),
-							_react2.default.createElement(
-								'button',
-								{ onClick: this.signup },
-								this.state.signingUp ? 'Signing Up..' : 'Sign Up'
-							),
-							_react2.default.createElement(
-								'button',
-								{ onClick: this.resetPassword },
-								this.state.resettingPassword ? 'Resetting Password..' : 'Reset Password'
-							)
+							'button',
+							{ onClick: this.signup },
+							this.state.signingUp ? 'Signing Up..' : 'Sign Up'
+						),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.resetPassword },
+							this.state.resettingPassword ? 'Resetting Password..' : 'Reset Password'
 						)
 					)
 				)
@@ -896,19 +860,19 @@ var Device = (function (_React$Component9) {
 			};
 
 			series.push(readings.map(function (r) {
-				return isValid(r) ? r.data.temperature : 0;
+				return isValid(r, 'temperature') ? r.data.temperature : 0;
 			}));
 			series.push(readings.map(function (r) {
-				return isValid(r) ? r.data.humidity : 0;
+				return isValid(r, 'humidity') ? r.data.humidity : 0;
 			}));
 			series.push(readings.map(function (r) {
-				return isValid(r) ? r.data.carbonMonoxide * 0.1 : 0;
+				return isValid(r, 'carbonMonoxide') ? r.data.carbonMonoxide * 0.1 : 0;
 			}));
 			series.push(readings.map(function (r) {
-				return isValid(r) ? r.data.uv * 0.1 : 0;
+				return isValid(r, 'uv') ? r.data.uv * 0.1 : 0;
 			}));
 			series.push(readings.map(function (r) {
-				return isValid(r) ? r.data.particles * 0.1 : 0;
+				return isValid(r, 'particles') ? r.data.particles * 0.1 : 0;
 			}));
 
 			return series;
@@ -1008,126 +972,118 @@ var Settings = (function (_React$Component10) {
 		value: function render() {
 			return _react2.default.createElement(
 				'div',
-				{ className: 'flex column' },
+				{ className: 'settings flex column align-center' },
 				_react2.default.createElement(
-					'div',
-					{ className: 'flex row' },
+					'form',
+					{ className: 'change-email flex column one', action: '#' },
 					_react2.default.createElement(
-						'form',
-						{ className: 'flex column', action: '#' },
+						'div',
+						{ className: 'flex row align-center justify-center' },
+						_react2.default.createElement(
+							'h3',
+							null,
+							'Change Email'
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'flex column' },
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row align-center justify-center' },
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'h3',
-								null,
-								'Change Email'
-							)
+								'label',
+								{ htmlFor: 'old-email' },
+								'Old Email'
+							),
+							_react2.default.createElement('input', { ref: 'oldEmail', id: 'old-email', type: 'email', className: 'validate' })
 						),
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row' },
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'oldEmail', id: 'old-email', type: 'email', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'old-email' },
-									'Old Email'
-								)
+								'label',
+								{ htmlFor: 'new-email' },
+								'New Email'
 							),
+							_react2.default.createElement('input', { ref: 'newEmail', id: 'new-email', type: 'email', className: 'validate' })
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'newEmail', id: 'new-email', type: 'email', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'new-email' },
-									'New Email'
-								)
+								'label',
+								{ htmlFor: 'password' },
+								'Password'
 							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'password', id: 'password', type: 'password', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'password' },
-									'Password'
-								)
-							),
-							_react2.default.createElement(
-								'button',
-								{ onClick: this.changeEmail },
-								this.state.changingEmail ? 'Submitting..' : 'Submit'
-							)
+							_react2.default.createElement('input', { ref: 'password', id: 'password', type: 'password', className: 'validate' })
+						),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.changeEmail },
+							this.state.changingEmail ? 'Submitting..' : 'Submit'
 						)
 					)
 				),
 				_react2.default.createElement(
-					'div',
-					{ className: 'flex row' },
+					'form',
+					{ className: 'change-password flex column one', action: '#' },
 					_react2.default.createElement(
-						'form',
-						{ className: 'flex column one', action: '#' },
+						'div',
+						{ className: 'flex row align-center justify-center' },
+						_react2.default.createElement(
+							'h3',
+							null,
+							'Change Password'
+						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'flex column' },
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row align-center justify-center' },
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'h3',
-								null,
-								'Change Password'
-							)
+								'label',
+								{ htmlFor: 'email' },
+								'Email'
+							),
+							_react2.default.createElement('input', { ref: 'email', id: 'email', type: 'email', className: 'validate' })
 						),
 						_react2.default.createElement(
 							'div',
-							{ className: 'flex row' },
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'email', id: 'email', type: 'email', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'email' },
-									'Email'
-								)
+								'label',
+								{ htmlFor: 'old-password' },
+								'Old Password'
 							),
+							_react2.default.createElement('input', { ref: 'oldPassword', id: 'old-password', type: 'password', className: 'validate' })
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'oldPassword', id: 'old-password', type: 'password', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'old-password' },
-									'Old Password'
-								)
+								'label',
+								{ htmlFor: 'new-password' },
+								'New Password'
 							),
+							_react2.default.createElement('input', { ref: 'newPassword', id: 'new-password', type: 'password', className: 'validate' })
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'flex column' },
 							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'newPassword', id: 'new-password', type: 'password', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'new-password' },
-									'New Password'
-								)
+								'label',
+								{ htmlFor: 'confirm-new-password' },
+								'Confirm New Password'
 							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'flex column one' },
-								_react2.default.createElement('input', { ref: 'confirmNewPassword', id: 'confirm-new-password', type: 'password', className: 'validate' }),
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'confirm-new-password' },
-									'Confirm New Password'
-								)
-							),
-							_react2.default.createElement(
-								'button',
-								{ onClick: this.changePassword },
-								this.state.changingPassword ? 'Submitting..' : 'Submit'
-							)
+							_react2.default.createElement('input', { ref: 'confirmNewPassword', id: 'confirm-new-password', type: 'password', className: 'validate' })
+						),
+						_react2.default.createElement(
+							'button',
+							{ onClick: this.changePassword },
+							this.state.changingPassword ? 'Submitting..' : 'Submit'
 						)
 					)
 				)
@@ -1167,10 +1123,10 @@ var Navbar = (function (_React$Component11) {
 				{ className: 'navbar' },
 				_react2.default.createElement(
 					'ul',
-					{ className: 'menu' },
+					{ className: 'navbar-menu flex row' },
 					_react2.default.createElement(
 						'li',
-						null,
+						{ className: 'flex navbar-menu-item' },
 						_react2.default.createElement(
 							'a',
 							{ href: '#', onClick: goto.bind(null, 'overview') },
@@ -1179,7 +1135,7 @@ var Navbar = (function (_React$Component11) {
 					),
 					_react2.default.createElement(
 						'li',
-						null,
+						{ className: 'flex navbar-menu-item' },
 						_react2.default.createElement(
 							'a',
 							{ href: '#', onClick: goto.bind(null, 'devices') },
@@ -1188,7 +1144,7 @@ var Navbar = (function (_React$Component11) {
 					),
 					_react2.default.createElement(
 						'li',
-						null,
+						{ className: 'flex navbar-menu-item' },
 						_react2.default.createElement(
 							'a',
 							{ href: '#', onClick: goto.bind(null, 'settings') },
@@ -1197,7 +1153,7 @@ var Navbar = (function (_React$Component11) {
 					),
 					_react2.default.createElement(
 						'li',
-						null,
+						{ className: 'flex navbar-menu-item' },
 						_react2.default.createElement(
 							'a',
 							{ href: '#', onClick: this.logout },
