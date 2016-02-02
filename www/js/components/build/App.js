@@ -1,6 +1,8 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
@@ -27,8 +29,6 @@ var _chartist = require('chartist');
 var _chartist2 = _interopRequireDefault(_chartist);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -86,7 +86,7 @@ function norm(value, min, max) {
 	return (value - min) / (max - min);
 }
 
-var ReadingObject = (function (_Parse$Object) {
+var ReadingObject = function (_Parse$Object) {
 	_inherits(ReadingObject, _Parse$Object);
 
 	function ReadingObject() {
@@ -96,9 +96,9 @@ var ReadingObject = (function (_Parse$Object) {
 	}
 
 	return ReadingObject;
-})(_parse2.default.Object);
+}(_parse2.default.Object);
 
-var App = (function (_React$Component) {
+var App = function (_React$Component) {
 	_inherits(App, _React$Component);
 
 	function App() {
@@ -167,9 +167,9 @@ var App = (function (_React$Component) {
 	}]);
 
 	return App;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var DeviceManager = (function (_React$Component2) {
+var DeviceManager = function (_React$Component2) {
 	_inherits(DeviceManager, _React$Component2);
 
 	function DeviceManager() {
@@ -268,9 +268,9 @@ var DeviceManager = (function (_React$Component2) {
 	}]);
 
 	return DeviceManager;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var NetworkManager = (function (_React$Component3) {
+var NetworkManager = function (_React$Component3) {
 	_inherits(NetworkManager, _React$Component3);
 
 	function NetworkManager() {
@@ -415,9 +415,9 @@ var NetworkManager = (function (_React$Component3) {
 	}]);
 
 	return NetworkManager;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Authentication = (function (_React$Component4) {
+var Authentication = function (_React$Component4) {
 	_inherits(Authentication, _React$Component4);
 
 	function Authentication() {
@@ -561,9 +561,9 @@ var Authentication = (function (_React$Component4) {
 	}]);
 
 	return Authentication;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Dashboard = (function (_React$Component5) {
+var Dashboard = function (_React$Component5) {
 	_inherits(Dashboard, _React$Component5);
 
 	function Dashboard() {
@@ -630,9 +630,9 @@ var Dashboard = (function (_React$Component5) {
 	}]);
 
 	return Dashboard;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Overview = (function (_React$Component6) {
+var Overview = function (_React$Component6) {
 	_inherits(Overview, _React$Component6);
 
 	function Overview() {
@@ -672,9 +672,9 @@ var Overview = (function (_React$Component6) {
 	}]);
 
 	return Overview;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Devices = (function (_React$Component7) {
+var Devices = function (_React$Component7) {
 	_inherits(Devices, _React$Component7);
 
 	function Devices() {
@@ -700,9 +700,9 @@ var Devices = (function (_React$Component7) {
 	}]);
 
 	return Devices;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var MyDevice = (function (_React$Component8) {
+var MyDevice = function (_React$Component8) {
 	_inherits(MyDevice, _React$Component8);
 
 	function MyDevice() {
@@ -802,7 +802,6 @@ var MyDevice = (function (_React$Component8) {
 				labels: this.readingLabels(),
 				series: this.readingSeries()
 			}, {
-				fullWidth: true,
 				lineSmooth: _chartist2.default.Interpolation.cardinal({
 					fillHoles: true
 				})
@@ -811,9 +810,9 @@ var MyDevice = (function (_React$Component8) {
 	}]);
 
 	return MyDevice;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Device = (function (_React$Component9) {
+var Device = function (_React$Component9) {
 	_inherits(Device, _React$Component9);
 
 	function Device() {
@@ -926,9 +925,9 @@ var Device = (function (_React$Component9) {
 	}]);
 
 	return Device;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Settings = (function (_React$Component10) {
+var Settings = function (_React$Component10) {
 	_inherits(Settings, _React$Component10);
 
 	function Settings() {
@@ -1092,9 +1091,9 @@ var Settings = (function (_React$Component10) {
 	}]);
 
 	return Settings;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
-var Navbar = (function (_React$Component11) {
+var Navbar = function (_React$Component11) {
 	_inherits(Navbar, _React$Component11);
 
 	function Navbar() {
@@ -1166,6 +1165,6 @@ var Navbar = (function (_React$Component11) {
 	}]);
 
 	return Navbar;
-})(_react2.default.Component);
+}(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('root'));

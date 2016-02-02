@@ -46,7 +46,9 @@
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(1);
 
@@ -64,17 +66,15 @@
 
 	var _parse2 = _interopRequireDefault(_parse);
 
-	var _pusherJs = __webpack_require__(237);
+	var _pusherJs = __webpack_require__(274);
 
 	var _pusherJs2 = _interopRequireDefault(_pusherJs);
 
-	var _chartist = __webpack_require__(238);
+	var _chartist = __webpack_require__(275);
 
 	var _chartist2 = _interopRequireDefault(_chartist);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -132,7 +132,7 @@
 		return (value - min) / (max - min);
 	}
 
-	var ReadingObject = (function (_Parse$Object) {
+	var ReadingObject = function (_Parse$Object) {
 		_inherits(ReadingObject, _Parse$Object);
 
 		function ReadingObject() {
@@ -142,9 +142,9 @@
 		}
 
 		return ReadingObject;
-	})(_parse2.default.Object);
+	}(_parse2.default.Object);
 
-	var App = (function (_React$Component) {
+	var App = function (_React$Component) {
 		_inherits(App, _React$Component);
 
 		function App() {
@@ -213,9 +213,9 @@
 		}]);
 
 		return App;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var DeviceManager = (function (_React$Component2) {
+	var DeviceManager = function (_React$Component2) {
 		_inherits(DeviceManager, _React$Component2);
 
 		function DeviceManager() {
@@ -314,9 +314,9 @@
 		}]);
 
 		return DeviceManager;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var NetworkManager = (function (_React$Component3) {
+	var NetworkManager = function (_React$Component3) {
 		_inherits(NetworkManager, _React$Component3);
 
 		function NetworkManager() {
@@ -461,9 +461,9 @@
 		}]);
 
 		return NetworkManager;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Authentication = (function (_React$Component4) {
+	var Authentication = function (_React$Component4) {
 		_inherits(Authentication, _React$Component4);
 
 		function Authentication() {
@@ -607,9 +607,9 @@
 		}]);
 
 		return Authentication;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Dashboard = (function (_React$Component5) {
+	var Dashboard = function (_React$Component5) {
 		_inherits(Dashboard, _React$Component5);
 
 		function Dashboard() {
@@ -676,9 +676,9 @@
 		}]);
 
 		return Dashboard;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Overview = (function (_React$Component6) {
+	var Overview = function (_React$Component6) {
 		_inherits(Overview, _React$Component6);
 
 		function Overview() {
@@ -718,9 +718,9 @@
 		}]);
 
 		return Overview;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Devices = (function (_React$Component7) {
+	var Devices = function (_React$Component7) {
 		_inherits(Devices, _React$Component7);
 
 		function Devices() {
@@ -746,9 +746,9 @@
 		}]);
 
 		return Devices;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var MyDevice = (function (_React$Component8) {
+	var MyDevice = function (_React$Component8) {
 		_inherits(MyDevice, _React$Component8);
 
 		function MyDevice() {
@@ -848,7 +848,6 @@
 					labels: this.readingLabels(),
 					series: this.readingSeries()
 				}, {
-					fullWidth: true,
 					lineSmooth: _chartist2.default.Interpolation.cardinal({
 						fillHoles: true
 					})
@@ -857,9 +856,9 @@
 		}]);
 
 		return MyDevice;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Device = (function (_React$Component9) {
+	var Device = function (_React$Component9) {
 		_inherits(Device, _React$Component9);
 
 		function Device() {
@@ -972,9 +971,9 @@
 		}]);
 
 		return Device;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Settings = (function (_React$Component10) {
+	var Settings = function (_React$Component10) {
 		_inherits(Settings, _React$Component10);
 
 		function Settings() {
@@ -1138,9 +1137,9 @@
 		}]);
 
 		return Settings;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
-	var Navbar = (function (_React$Component11) {
+	var Navbar = function (_React$Component11) {
 		_inherits(Navbar, _React$Component11);
 
 		function Navbar() {
@@ -1212,7 +1211,7 @@
 		}]);
 
 		return Navbar;
-	})(_react2.default.Component);
+	}(_react2.default.Component);
 
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('root'));
 
@@ -10473,6 +10472,7 @@
 	 */
 	var EventInterface = {
 	  type: null,
+	  target: null,
 	  // currentTarget is set when dispatching; no use in copying it here
 	  currentTarget: emptyFunction.thatReturnsNull,
 	  eventPhase: null,
@@ -10506,8 +10506,6 @@
 	  this.dispatchConfig = dispatchConfig;
 	  this.dispatchMarker = dispatchMarker;
 	  this.nativeEvent = nativeEvent;
-	  this.target = nativeEventTarget;
-	  this.currentTarget = nativeEventTarget;
 
 	  var Interface = this.constructor.Interface;
 	  for (var propName in Interface) {
@@ -10518,7 +10516,11 @@
 	    if (normalize) {
 	      this[propName] = normalize(nativeEvent);
 	    } else {
-	      this[propName] = nativeEvent[propName];
+	      if (propName === 'target') {
+	        this.target = nativeEventTarget;
+	      } else {
+	        this[propName] = nativeEvent[propName];
+	      }
 	    }
 	  }
 
@@ -14367,7 +14369,10 @@
 	      }
 	    });
 
-	    nativeProps.children = content;
+	    if (content) {
+	      nativeProps.children = content;
+	    }
+
 	    return nativeProps;
 	  }
 
@@ -19840,7 +19845,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.6';
+	module.exports = '0.14.7';
 
 /***/ },
 /* 147 */
@@ -21157,7 +21162,7 @@
 
 	var _CoreManager2 = _interopRequireDefault(_CoreManager);
 
-	var _InstallationController = __webpack_require__(229);
+	var _InstallationController = __webpack_require__(266);
 
 	var _InstallationController2 = _interopRequireDefault(_InstallationController);
 
@@ -21165,7 +21170,7 @@
 
 	var ParseOp = _interopRequireWildcard(_ParseOp);
 
-	var _RESTController = __webpack_require__(230);
+	var _RESTController = __webpack_require__(267);
 
 	var _RESTController2 = _interopRequireDefault(_RESTController);
 
@@ -21235,15 +21240,15 @@
 	/** End setters **/
 
 	Parse.ACL = __webpack_require__(167);
-	Parse.Analytics = __webpack_require__(231);
-	Parse.Cloud = __webpack_require__(232);
+	Parse.Analytics = __webpack_require__(268);
+	Parse.Cloud = __webpack_require__(269);
 	Parse.CoreManager = __webpack_require__(207);
-	Parse.Config = __webpack_require__(233);
+	Parse.Config = __webpack_require__(270);
 	Parse.Error = __webpack_require__(202);
-	Parse.FacebookUtils = __webpack_require__(234);
+	Parse.FacebookUtils = __webpack_require__(271);
 	Parse.File = __webpack_require__(209);
 	Parse.GeoPoint = __webpack_require__(215);
-	Parse.Installation = __webpack_require__(235);
+	Parse.Installation = __webpack_require__(272);
 	Parse.Object = __webpack_require__(203);
 	Parse.Op = {
 	  Set: ParseOp.SetOp,
@@ -21255,13 +21260,13 @@
 	  Relation: ParseOp.RelationOp
 	};
 	Parse.Promise = __webpack_require__(210);
-	Parse.Push = __webpack_require__(236);
+	Parse.Push = __webpack_require__(273);
 	Parse.Query = __webpack_require__(217);
 	Parse.Relation = __webpack_require__(211);
 	Parse.Role = __webpack_require__(185);
-	Parse.Session = __webpack_require__(226);
-	Parse.Storage = __webpack_require__(227);
-	Parse.User = __webpack_require__(224);
+	Parse.Session = __webpack_require__(263);
+	Parse.Storage = __webpack_require__(264);
+	Parse.User = __webpack_require__(261);
 
 	Parse._request = function () {
 	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -21461,7 +21466,7 @@
 
 	var _ParseRole2 = _interopRequireDefault(_ParseRole);
 
-	var _ParseUser = __webpack_require__(224);
+	var _ParseUser = __webpack_require__(261);
 
 	var _ParseUser2 = _interopRequireDefault(_ParseUser);
 
@@ -23024,15 +23029,11 @@
 
 	var _escape3 = _interopRequireDefault(_escape2);
 
-	var _ObjectState = __webpack_require__(220);
-
-	var ObjectState = _interopRequireWildcard(_ObjectState);
-
 	var _ParseACL = __webpack_require__(167);
 
 	var _ParseACL2 = _interopRequireDefault(_ParseACL);
 
-	var _parseDate = __webpack_require__(222);
+	var _parseDate = __webpack_require__(220);
 
 	var _parseDate2 = _interopRequireDefault(_parseDate);
 
@@ -23058,11 +23059,19 @@
 
 	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
 
+	var _SingleInstanceStateController = __webpack_require__(221);
+
+	var SingleInstanceStateController = _interopRequireWildcard(_SingleInstanceStateController);
+
 	var _unique = __webpack_require__(216);
 
 	var _unique2 = _interopRequireDefault(_unique);
 
-	var _unsavedChildren = __webpack_require__(223);
+	var _UniqueInstanceStateController = __webpack_require__(224);
+
+	var UniqueInstanceStateController = _interopRequireWildcard(_UniqueInstanceStateController);
+
+	var _unsavedChildren = __webpack_require__(260);
 
 	var _unsavedChildren2 = _interopRequireDefault(_unsavedChildren);
 
@@ -23078,6 +23087,11 @@
 	// will have the same attributes. However, this may be dangerous default
 	// behavior in a server scenario
 	var singleInstance = !_CoreManager2['default'].get('IS_NODE');
+	if (singleInstance) {
+	  _CoreManager2['default'].setObjectStateController(SingleInstanceStateController);
+	} else {
+	  _CoreManager2['default'].setObjectStateController(UniqueInstanceStateController);
+	}
 
 	function getServerUrlPath() {
 	  var serverUrl = _CoreManager2['default'].get('SERVER_URL');
@@ -23167,25 +23181,29 @@
 	    }
 
 	    /**
-	     * Returns a local or server Id used to pull data from the Object State store
-	     * If single instance objects are disabled, it will use the object's unique
-	     * count to separate its data from other objects with the same server Id.
+	     * Returns a unique identifier used to pull data from the State Controller.
 	     */
 	  }, {
 	    key: '_getStateIdentifier',
 	    value: function _getStateIdentifier() {
-	      if (typeof this.id === 'string') {
-	        if (singleInstance) {
-	          return this.id;
+	      if (singleInstance) {
+	        var id = this.id;
+	        if (!id) {
+	          id = this._getId();
 	        }
-	        return this.id + '_' + String(this._objCount);
+	        return {
+	          id: id,
+	          className: this.className
+	        };
+	      } else {
+	        return this;
 	      }
-	      return this._getId();
 	    }
 	  }, {
 	    key: '_getServerData',
 	    value: function _getServerData() {
-	      return ObjectState.getServerData(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      return stateController.getServerData(this._getStateIdentifier());
 	    }
 	  }, {
 	    key: '_clearServerData',
@@ -23195,12 +23213,14 @@
 	      for (var attr in serverData) {
 	        unset[attr] = undefined;
 	      }
-	      ObjectState.setServerData(this.className, this._getStateIdentifier(), unset);
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      stateController.setServerData(this._getStateIdentifier(), unset);
 	    }
 	  }, {
 	    key: '_getPendingOps',
 	    value: function _getPendingOps() {
-	      return ObjectState.getPendingOps(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      return stateController.getPendingOps(this._getStateIdentifier());
 	    }
 	  }, {
 	    key: '_clearPendingOps',
@@ -23216,7 +23236,8 @@
 	    key: '_getDirtyObjectAttributes',
 	    value: function _getDirtyObjectAttributes() {
 	      var attributes = this.attributes;
-	      var objectCache = ObjectState.getObjectCache(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      var objectCache = stateController.getObjectCache(this._getStateIdentifier());
 	      var dirty = {};
 	      for (var attr in attributes) {
 	        var val = attributes[attr];
@@ -23284,7 +23305,8 @@
 	      if (!this.id && serverData.objectId) {
 	        this.id = serverData.objectId;
 	      }
-	      ObjectState.initializeState(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      stateController.initializeState(this._getStateIdentifier());
 	      var decoded = {};
 	      for (var attr in serverData) {
 	        if (attr === 'ACL') {
@@ -23305,12 +23327,13 @@
 	      if (!decoded.updatedAt && decoded.createdAt) {
 	        decoded.updatedAt = decoded.createdAt;
 	      }
-	      ObjectState.commitServerChanges(this.className, this._getStateIdentifier(), decoded);
+	      stateController.commitServerChanges(this._getStateIdentifier(), decoded);
 	    }
 	  }, {
 	    key: '_setExisted',
 	    value: function _setExisted(existed) {
-	      var state = ObjectState.getState(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      var state = stateController.getState(this._getStateIdentifier());
 	      if (state) {
 	        state.existed = existed;
 	      }
@@ -23319,11 +23342,17 @@
 	    key: '_migrateId',
 	    value: function _migrateId(serverId) {
 	      if (this._localId && serverId) {
-	        var oldState = ObjectState.removeState(this.className, this._getStateIdentifier());
-	        this.id = serverId;
-	        delete this._localId;
-	        if (oldState) {
-	          ObjectState.initializeState(this.className, this._getStateIdentifier(), oldState);
+	        if (singleInstance) {
+	          var stateController = _CoreManager2['default'].getObjectStateController();
+	          var oldState = stateController.removeState(this._getStateIdentifier());
+	          this.id = serverId;
+	          delete this._localId;
+	          if (oldState) {
+	            stateController.initializeState(this._getStateIdentifier(), oldState);
+	          }
+	        } else {
+	          this.id = serverId;
+	          delete this._localId;
 	        }
 	      }
 	    }
@@ -23332,7 +23361,8 @@
 	    value: function _handleSaveResponse(response, status) {
 	      var changes = {};
 	      var attr;
-	      var pending = ObjectState.popPendingState(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      var pending = stateController.popPendingState(this._getStateIdentifier());
 	      for (attr in pending) {
 	        if (pending[attr] instanceof _ParseOp.RelationOp) {
 	          changes[attr] = pending[attr].applyTo(undefined, this, attr);
@@ -23360,13 +23390,14 @@
 	        this._setExisted(true);
 	      }
 
-	      ObjectState.commitServerChanges(this.className, this._getStateIdentifier(), changes);
+	      stateController.commitServerChanges(this._getStateIdentifier(), changes);
 	    }
 	  }, {
 	    key: '_handleSaveError',
 	    value: function _handleSaveError() {
 	      var pending = this._getPendingOps();
-	      ObjectState.mergeFirstPendingState(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      stateController.mergeFirstPendingState(this._getStateIdentifier());
 	    }
 
 	    /** Public methods **/
@@ -23663,9 +23694,10 @@
 	      // Consolidate Ops
 	      var pendingOps = this._getPendingOps();
 	      var last = pendingOps.length - 1;
+	      var stateController = _CoreManager2['default'].getObjectStateController();
 	      for (var attr in newOps) {
 	        var nextOp = newOps[attr].mergeWith(pendingOps[last][attr]);
-	        ObjectState.setPendingOp(this.className, this._getStateIdentifier(), attr, nextOp);
+	        stateController.setPendingOp(this._getStateIdentifier(), attr, nextOp);
 	      }
 
 	      return this;
@@ -23810,7 +23842,8 @@
 	      if (!this.id) {
 	        return false;
 	      }
-	      var state = ObjectState.getState(this.className, this._getStateIdentifier());
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      var state = stateController.getState(this._getStateIdentifier());
 	      if (state) {
 	        return state.existed;
 	      }
@@ -23882,6 +23915,16 @@
 	    key: 'setACL',
 	    value: function setACL(acl, options) {
 	      return this.set('ACL', acl, options);
+	    }
+
+	    /**
+	     * Clears any changes to this object made since the last call to save()
+	     * @method revert
+	     */
+	  }, {
+	    key: 'revert',
+	    value: function revert() {
+	      this._clearPendingOps();
 	    }
 
 	    /**
@@ -23993,7 +24036,9 @@
 	      var options;
 	      if (typeof arg1 === 'object' || typeof arg1 === 'undefined') {
 	        attrs = arg1;
-	        options = arg2;
+	        if (typeof arg2 === 'object') {
+	          options = arg2;
+	        }
 	      } else {
 	        attrs = {};
 	        attrs[arg1] = arg2;
@@ -24080,7 +24125,8 @@
 	  }, {
 	    key: 'attributes',
 	    get: function get() {
-	      return _Object$freeze(ObjectState.estimateAttributes(this.className, this._getStateIdentifier()));
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      return _Object$freeze(stateController.estimateAttributes(this._getStateIdentifier()));
 	    }
 
 	    /**
@@ -24107,7 +24153,8 @@
 	  }], [{
 	    key: '_clearAllState',
 	    value: function _clearAllState() {
-	      ObjectState._clearAllState();
+	      var stateController = _CoreManager2['default'].getObjectStateController();
+	      stateController.clearAllState();
 	    }
 
 	    /**
@@ -24512,6 +24559,7 @@
 	    key: 'enableSingleInstance',
 	    value: function enableSingleInstance() {
 	      singleInstance = true;
+	      _CoreManager2['default'].setObjectStateController(SingleInstanceStateController);
 	    }
 
 	    /**
@@ -24525,6 +24573,7 @@
 	    key: 'disableSingleInstance',
 	    value: function disableSingleInstance() {
 	      singleInstance = false;
+	      _CoreManager2['default'].setObjectStateController(UniqueInstanceStateController);
 	    }
 	  }]);
 
@@ -24668,6 +24717,7 @@
 
 	  save: function save(target, options) {
 	    var RESTController = _CoreManager2['default'].getRESTController();
+	    var stateController = _CoreManager2['default'].getObjectStateController();
 	    if (Array.isArray(target)) {
 	      if (target.length < 1) {
 	        return _ParsePromise2['default'].as([]);
@@ -24736,8 +24786,8 @@
 	                }
 	              });
 	            };
-	            ObjectState.pushPendingState(obj.className, obj._getStateIdentifier());
-	            batchTasks.push(ObjectState.enqueueTask(obj.className, obj._getStateIdentifier(), task));
+	            stateController.pushPendingState(obj._getStateIdentifier());
+	            batchTasks.push(stateController.enqueueTask(obj._getStateIdentifier(), task));
 	          });
 
 	          _ParsePromise2['default'].when(batchReady).then(function () {
@@ -24773,11 +24823,12 @@
 	          return _ParsePromise2['default'].error(error);
 	        });
 	      };
-	      ObjectState.pushPendingState(target.className, target._getStateIdentifier());
-	      return ObjectState.enqueueTask(target.className, target._getStateIdentifier(), task).then(function () {
+
+	      stateController.pushPendingState(target._getStateIdentifier());
+	      return stateController.enqueueTask(target._getStateIdentifier(), task).then(function () {
 	        return target;
 	      }, function (error) {
-	        return error;
+	        return _ParsePromise2['default'].error(error);
 	      });
 	    }
 	    return _ParsePromise2['default'].as();
@@ -24839,7 +24890,7 @@
 	  IS_NODE: typeof process !== 'undefined' && !!process.versions && !!process.versions.node,
 	  REQUEST_ATTEMPT_LIMIT: 5,
 	  SERVER_URL: 'https://api.parse.com/1',
-	  VERSION: 'js' + '1.6.14',
+	  VERSION: 'js' + '1.7.0',
 	  APPLICATION_ID: null,
 	  JAVASCRIPT_KEY: null,
 	  MASTER_KEY: null,
@@ -24923,17 +24974,6 @@
 	    return config['InstallationController'];
 	  },
 
-	  setPushController: function setPushController(controller) {
-	    if (typeof controller.send !== 'function') {
-	      throw new Error('PushController must implement send()');
-	    }
-	    config['PushController'] = controller;
-	  },
-
-	  getPushController: function getPushController() {
-	    return config['PushController'];
-	  },
-
 	  setObjectController: function setObjectController(controller) {
 	    if (typeof controller.save !== 'function') {
 	      throw new Error('ObjectController must implement save()');
@@ -24949,6 +24989,74 @@
 
 	  getObjectController: function getObjectController() {
 	    return config['ObjectController'];
+	  },
+
+	  setObjectStateController: function setObjectStateController(controller) {
+	    if (typeof controller.getState !== 'function') {
+	      throw new Error('ObjectStateController must implement getState()');
+	    }
+	    if (typeof controller.initializeState !== 'function') {
+	      throw new Error('ObjectStateController must implement initializeState()');
+	    }
+	    if (typeof controller.removeState !== 'function') {
+	      throw new Error('ObjectStateController must implement removeState()');
+	    }
+	    if (typeof controller.getServerData !== 'function') {
+	      throw new Error('ObjectStateController must implement getServerData()');
+	    }
+	    if (typeof controller.setServerData !== 'function') {
+	      throw new Error('ObjectStateController must implement setServerData()');
+	    }
+	    if (typeof controller.getPendingOps !== 'function') {
+	      throw new Error('ObjectStateController must implement getPendingOps()');
+	    }
+	    if (typeof controller.setPendingOp !== 'function') {
+	      throw new Error('ObjectStateController must implement setPendingOp()');
+	    }
+	    if (typeof controller.pushPendingState !== 'function') {
+	      throw new Error('ObjectStateController must implement pushPendingState()');
+	    }
+	    if (typeof controller.popPendingState !== 'function') {
+	      throw new Error('ObjectStateController must implement popPendingState()');
+	    }
+	    if (typeof controller.mergeFirstPendingState !== 'function') {
+	      throw new Error('ObjectStateController must implement mergeFirstPendingState()');
+	    }
+	    if (typeof controller.getObjectCache !== 'function') {
+	      throw new Error('ObjectStateController must implement getObjectCache()');
+	    }
+	    if (typeof controller.estimateAttribute !== 'function') {
+	      throw new Error('ObjectStateController must implement estimateAttribute()');
+	    }
+	    if (typeof controller.estimateAttributes !== 'function') {
+	      throw new Error('ObjectStateController must implement estimateAttributes()');
+	    }
+	    if (typeof controller.commitServerChanges !== 'function') {
+	      throw new Error('ObjectStateController must implement commitServerChanges()');
+	    }
+	    if (typeof controller.enqueueTask !== 'function') {
+	      throw new Error('ObjectStateController must implement enqueueTask()');
+	    }
+	    if (typeof controller.clearAllState !== 'function') {
+	      throw new Error('ObjectStateController must implement clearAllState()');
+	    }
+
+	    config['ObjectStateController'] = controller;
+	  },
+
+	  getObjectStateController: function getObjectStateController() {
+	    return config['ObjectStateController'];
+	  },
+
+	  setPushController: function setPushController(controller) {
+	    if (typeof controller.send !== 'function') {
+	      throw new Error('PushController must implement send()');
+	    }
+	    config['PushController'] = controller;
+	  },
+
+	  getPushController: function getPushController() {
+	    return config['PushController'];
 	  },
 
 	  setQueryController: function setQueryController(controller) {
@@ -25432,7 +25540,7 @@
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	var _isPromisesAPlusCompliant = false;
+	var _isPromisesAPlusCompliant = true;
 
 	/**
 	 * A Promise is returned by async methods as a hook to provide callbacks to be
@@ -25452,13 +25560,17 @@
 	 */
 
 	var ParsePromise = (function () {
-	  function ParsePromise() {
+	  function ParsePromise(executor) {
 	    _classCallCheck(this, ParsePromise);
 
 	    this._resolved = false;
 	    this._rejected = false;
 	    this._resolvedCallbacks = [];
 	    this._rejectedCallbacks = [];
+
+	    if (typeof executor === 'function') {
+	      executor(this.resolve.bind(this), this.reject.bind(this));
+	    }
 	  }
 
 	  /**
@@ -25761,6 +25873,28 @@
 	    }
 
 	    /**
+	     * Returns a new promise that is resolved with a given value.
+	     * If that value is a thenable Promise (has a .then() prototype
+	     * method), the new promise will be chained to the end of the
+	     * value.
+	     * @method resolve
+	     * @param value The value to resolve the promise with
+	     * @static
+	     * @return {Parse.Promise} the new promise.
+	     */
+	  }, {
+	    key: 'resolve',
+	    value: function resolve(value) {
+	      return new ParsePromise(function (resolve, reject) {
+	        if (ParsePromise.is(value)) {
+	          value.then(resolve, reject);
+	        } else {
+	          resolve(value);
+	        }
+	      });
+	    }
+
+	    /**
 	     * Returns a new promise that is rejected with a given error.
 	     * @method error
 	     * @param error The error to reject the promise with
@@ -25778,6 +25912,25 @@
 
 	      promise.reject.apply(promise, errors);
 	      return promise;
+	    }
+
+	    /**
+	     * Returns a new promise that is rejected with a given error.
+	     * This is an alias for Parse.Promise.error, for compliance with
+	     * the ES6 implementation.
+	     * @method reject
+	     * @param error The error to reject the promise with
+	     * @static
+	     * @return {Parse.Promise} the new promise.
+	     */
+	  }, {
+	    key: 'reject',
+	    value: function reject() {
+	      for (var _len6 = arguments.length, errors = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+	        errors[_key6] = arguments[_key6];
+	      }
+
+	      return ParsePromise.error.apply(null, errors);
 	    }
 
 	    /**
@@ -25812,7 +25965,8 @@
 	    key: 'when',
 	    value: function when(promises) {
 	      var objects;
-	      if (Array.isArray(promises)) {
+	      var arrayArgument = Array.isArray(promises);
+	      if (arrayArgument) {
 	        objects = promises;
 	      } else {
 	        objects = arguments;
@@ -25821,12 +25975,13 @@
 	      var total = objects.length;
 	      var hadError = false;
 	      var results = [];
+	      var returnValue = arrayArgument ? [results] : results;
 	      var errors = [];
 	      results.length = objects.length;
 	      errors.length = objects.length;
 
 	      if (total === 0) {
-	        return ParsePromise.as.apply(this, results);
+	        return ParsePromise.as.apply(this, returnValue);
 	      }
 
 	      var promise = new ParsePromise();
@@ -25837,7 +25992,7 @@
 	          if (hadError) {
 	            promise.reject(errors);
 	          } else {
-	            promise.resolve.apply(promise, results);
+	            promise.resolve.apply(promise, returnValue);
 	          }
 	        }
 	      };
@@ -27373,8 +27528,11 @@
 
 	      return controller.find(this.className, this.toJSON(), findOptions).then(function (response) {
 	        return response.results.map(function (data) {
+	          // In cases of relations, the server may send back a className
+	          // on the top level of the payload
+	          var override = response.className || _this.className;
 	          if (!data.className) {
-	            data.className = _this.className;
+	            data.className = override;
 	          }
 	          return _ParseObject2['default'].fromJSON(data);
 	        });
@@ -28350,6 +28508,200 @@
 
 /***/ },
 /* 220 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = parseDate;
+
+	function parseDate(iso8601) {
+	  var regexp = new RegExp('^([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2})' + 'T' + '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})' + '(.([0-9]+))?' + 'Z$');
+	  var match = regexp.exec(iso8601);
+	  if (!match) {
+	    return null;
+	  }
+
+	  var year = match[1] || 0;
+	  var month = (match[2] || 1) - 1;
+	  var day = match[3] || 0;
+	  var hour = match[4] || 0;
+	  var minute = match[5] || 0;
+	  var second = match[6] || 0;
+	  var milli = match[8] || 0;
+
+	  return new Date(Date.UTC(year, month, day, hour, minute, second, milli));
+	}
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 221 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2015-present, Parse, LLC.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * 
+	 */
+
+	'use strict';
+
+	var _interopRequireWildcard = __webpack_require__(165)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.getState = getState;
+	exports.initializeState = initializeState;
+	exports.removeState = removeState;
+	exports.getServerData = getServerData;
+	exports.setServerData = setServerData;
+	exports.getPendingOps = getPendingOps;
+	exports.setPendingOp = setPendingOp;
+	exports.pushPendingState = pushPendingState;
+	exports.popPendingState = popPendingState;
+	exports.mergeFirstPendingState = mergeFirstPendingState;
+	exports.getObjectCache = getObjectCache;
+	exports.estimateAttribute = estimateAttribute;
+	exports.estimateAttributes = estimateAttributes;
+	exports.commitServerChanges = commitServerChanges;
+	exports.enqueueTask = enqueueTask;
+	exports.clearAllState = clearAllState;
+
+	var _ObjectStateMutations = __webpack_require__(222);
+
+	var ObjectStateMutations = _interopRequireWildcard(_ObjectStateMutations);
+
+	var objectState = {};
+
+	function getState(obj) {
+	  var classData = objectState[obj.className];
+	  if (classData) {
+	    return classData[obj.id] || null;
+	  }
+	  return null;
+	}
+
+	function initializeState(obj, initial) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state;
+	  }
+	  if (!objectState[obj.className]) {
+	    objectState[obj.className] = {};
+	  }
+	  if (!initial) {
+	    initial = ObjectStateMutations.defaultState();
+	  }
+	  state = objectState[obj.className][obj.id] = initial;
+	  return state;
+	}
+
+	function removeState(obj) {
+	  var state = getState(obj);
+	  if (state === null) {
+	    return null;
+	  }
+	  delete objectState[obj.className][obj.id];
+	  return state;
+	}
+
+	function getServerData(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.serverData;
+	  }
+	  return {};
+	}
+
+	function setServerData(obj, attributes) {
+	  var serverData = initializeState(obj).serverData;
+	  ObjectStateMutations.setServerData(serverData, attributes);
+	}
+
+	function getPendingOps(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.pendingOps;
+	  }
+	  return [{}];
+	}
+
+	function setPendingOp(obj, attr, op) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  ObjectStateMutations.setPendingOp(pendingOps, attr, op);
+	}
+
+	function pushPendingState(obj) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  ObjectStateMutations.pushPendingState(pendingOps);
+	}
+
+	function popPendingState(obj) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  return ObjectStateMutations.popPendingState(pendingOps);
+	}
+
+	function mergeFirstPendingState(obj) {
+	  var pendingOps = getPendingOps(obj);
+	  ObjectStateMutations.mergeFirstPendingState(pendingOps);
+	}
+
+	function getObjectCache(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.objectCache;
+	  }
+	  return {};
+	}
+
+	function estimateAttribute(obj, attr) {
+	  var serverData = getServerData(obj);
+	  var pendingOps = getPendingOps(obj);
+	  return ObjectStateMutations.estimateAttribute(serverData, pendingOps, obj.className, obj.id, attr);
+	}
+
+	function estimateAttributes(obj) {
+	  var serverData = getServerData(obj);
+	  var pendingOps = getPendingOps(obj);
+	  return ObjectStateMutations.estimateAttributes(serverData, pendingOps, obj.className, obj.id);
+	}
+
+	function commitServerChanges(obj, changes) {
+	  var state = initializeState(obj);
+	  ObjectStateMutations.commitServerChanges(state.serverData, state.objectCache, changes);
+	}
+
+	function enqueueTask(obj, task) {
+	  var state = initializeState(obj);
+	  return state.tasks.enqueue(task);
+	}
+
+	function clearAllState() {
+	  objectState = {};
+	}
+
+/***/ },
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28370,22 +28722,15 @@
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	exports.getState = getState;
-	exports.initializeState = initializeState;
-	exports.removeState = removeState;
-	exports.getServerData = getServerData;
+	exports.defaultState = defaultState;
 	exports.setServerData = setServerData;
-	exports.getPendingOps = getPendingOps;
 	exports.setPendingOp = setPendingOp;
 	exports.pushPendingState = pushPendingState;
 	exports.popPendingState = popPendingState;
 	exports.mergeFirstPendingState = mergeFirstPendingState;
-	exports.getObjectCache = getObjectCache;
 	exports.estimateAttribute = estimateAttribute;
 	exports.estimateAttributes = estimateAttributes;
 	exports.commitServerChanges = commitServerChanges;
-	exports.enqueueTask = enqueueTask;
-	exports._clearAllState = _clearAllState;
 
 	var _encode = __webpack_require__(214);
 
@@ -28407,186 +28752,113 @@
 
 	var _ParseRelation2 = _interopRequireDefault(_ParseRelation);
 
-	var _TaskQueue = __webpack_require__(221);
+	var _TaskQueue = __webpack_require__(223);
 
 	var _TaskQueue2 = _interopRequireDefault(_TaskQueue);
 
 	var _ParseOp = __webpack_require__(212);
 
-	var objectState = {};
-
-	function getState(className, id) {
-	  var classData = objectState[className];
-	  if (classData) {
-	    return classData[id] || null;
-	  }
-	  return null;
+	function defaultState() {
+	  return {
+	    serverData: {},
+	    pendingOps: [{}],
+	    objectCache: {},
+	    tasks: new _TaskQueue2['default'](),
+	    existed: false
+	  };
 	}
 
-	function initializeState(className, id, initial) {
-	  var state = getState(className, id);
-	  if (state) {
-	    return state;
-	  }
-	  if (!objectState[className]) {
-	    objectState[className] = {};
-	  }
-	  if (!initial) {
-	    initial = {
-	      serverData: {},
-	      pendingOps: [{}],
-	      objectCache: {},
-	      tasks: new _TaskQueue2['default'](),
-	      existed: false
-	    };
-	  }
-	  state = objectState[className][id] = initial;
-	  return state;
-	}
-
-	function removeState(className, id) {
-	  var state = getState(className, id);
-	  if (state === null) {
-	    return null;
-	  }
-	  delete objectState[className][id];
-	  return state;
-	}
-
-	function getServerData(className, id) {
-	  var state = getState(className, id);
-	  if (state) {
-	    return state.serverData;
-	  }
-	  return {};
-	}
-
-	function setServerData(className, id, attributes) {
-	  var data = initializeState(className, id).serverData;
-	  for (var attr in attributes) {
-	    if (typeof attributes[attr] !== 'undefined') {
-	      data[attr] = attributes[attr];
+	function setServerData(serverData, attributes) {
+	  for (var _attr in attributes) {
+	    if (typeof attributes[_attr] !== 'undefined') {
+	      serverData[_attr] = attributes[_attr];
 	    } else {
-	      delete data[attr];
+	      delete serverData[_attr];
 	    }
 	  }
 	}
 
-	function getPendingOps(className, id) {
-	  var state = getState(className, id);
-	  if (state) {
-	    return state.pendingOps;
-	  }
-	  return [{}];
-	}
-
-	function setPendingOp(className, id, attr, op) {
-	  var pending = initializeState(className, id).pendingOps;
-	  var last = pending.length - 1;
+	function setPendingOp(pendingOps, attr, op) {
+	  var last = pendingOps.length - 1;
 	  if (op) {
-	    pending[last][attr] = op;
+	    pendingOps[last][attr] = op;
 	  } else {
-	    delete pending[last][attr];
+	    delete pendingOps[last][attr];
 	  }
 	}
 
-	function pushPendingState(className, id) {
-	  var pending = initializeState(className, id).pendingOps;
-	  pending.push({});
+	function pushPendingState(pendingOps) {
+	  pendingOps.push({});
 	}
 
-	function popPendingState(className, id) {
-	  var pending = initializeState(className, id).pendingOps;
-	  var first = pending.shift();
-	  if (!pending.length) {
-	    pending[0] = {};
+	function popPendingState(pendingOps) {
+	  var first = pendingOps.shift();
+	  if (!pendingOps.length) {
+	    pendingOps[0] = {};
 	  }
 	  return first;
 	}
 
-	function mergeFirstPendingState(className, id) {
-	  var first = popPendingState(className, id);
-	  var pending = getPendingOps(className, id);
-	  var next = pending[0];
-	  for (var attr in first) {
-	    if (next[attr] && first[attr]) {
-	      var merged = next[attr].mergeWith(first[attr]);
+	function mergeFirstPendingState(pendingOps) {
+	  var first = popPendingState(pendingOps);
+	  var next = pendingOps[0];
+	  for (var _attr2 in first) {
+	    if (next[_attr2] && first[_attr2]) {
+	      var merged = next[_attr2].mergeWith(first[_attr2]);
 	      if (merged) {
-	        next[attr] = merged;
+	        next[_attr2] = merged;
 	      }
 	    } else {
-	      next[attr] = first[attr];
+	      next[_attr2] = first[_attr2];
 	    }
 	  }
 	}
 
-	function getObjectCache(className, id) {
-	  var state = getState(className, id);
-	  if (state) {
-	    return state.objectCache;
-	  }
-	  return {};
-	}
-
-	function estimateAttribute(className, id, attr) {
-	  var serverData = getServerData(className, id);
+	function estimateAttribute(serverData, pendingOps, className, id, attr) {
 	  var value = serverData[attr];
-	  var pending = getPendingOps(className, id);
-	  for (var i = 0; i < pending.length; i++) {
-	    if (pending[i][attr]) {
-	      if (pending[i][attr] instanceof _ParseOp.RelationOp) {
-	        value = pending[i][attr].applyTo(value, { className: className, id: id }, attr);
+	  for (var i = 0; i < pendingOps.length; i++) {
+	    if (pendingOps[i][attr]) {
+	      if (pendingOps[i][attr] instanceof _ParseOp.RelationOp) {
+	        value = pendingOps[i][attr].applyTo(value, { className: className, id: id }, attr);
 	      } else {
-	        value = pending[i][attr].applyTo(value);
+	        value = pendingOps[i][attr].applyTo(value);
 	      }
 	    }
 	  }
 	  return value;
 	}
 
-	function estimateAttributes(className, id) {
+	function estimateAttributes(serverData, pendingOps, className, id) {
 	  var data = {};
-	  var attr;
-	  var serverData = getServerData(className, id);
+	  var attr = undefined;
 	  for (attr in serverData) {
 	    data[attr] = serverData[attr];
 	  }
-	  var pending = getPendingOps(className, id);
-	  for (var i = 0; i < pending.length; i++) {
-	    for (attr in pending[i]) {
-	      if (pending[i][attr] instanceof _ParseOp.RelationOp) {
-	        data[attr] = pending[i][attr].applyTo(data[attr], { className: className, id: id }, attr);
+	  for (var i = 0; i < pendingOps.length; i++) {
+	    for (attr in pendingOps[i]) {
+	      if (pendingOps[i][attr] instanceof _ParseOp.RelationOp) {
+	        data[attr] = pendingOps[i][attr].applyTo(data[attr], { className: className, id: id }, attr);
 	      } else {
-	        data[attr] = pending[i][attr].applyTo(data[attr]);
+	        data[attr] = pendingOps[i][attr].applyTo(data[attr]);
 	      }
 	    }
 	  }
 	  return data;
 	}
 
-	function commitServerChanges(className, id, changes) {
-	  var state = initializeState(className, id);
-	  for (var attr in changes) {
-	    var val = changes[attr];
-	    state.serverData[attr] = val;
+	function commitServerChanges(serverData, objectCache, changes) {
+	  for (var _attr3 in changes) {
+	    var val = changes[_attr3];
+	    serverData[_attr3] = val;
 	    if (val && typeof val === 'object' && !(val instanceof _ParseObject2['default']) && !(val instanceof _ParseFile2['default']) && !(val instanceof _ParseRelation2['default'])) {
 	      var json = (0, _encode2['default'])(val, false, true);
-	      state.objectCache[attr] = JSON.stringify(json);
+	      objectCache[_attr3] = JSON.stringify(json);
 	    }
 	  }
 	}
 
-	function enqueueTask(className, id, task) {
-	  var state = initializeState(className, id);
-	  return state.tasks.enqueue(task);
-	}
-
-	function _clearAllState() {
-	  objectState = {};
-	}
-
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28663,8 +28935,8 @@
 	})();
 
 /***/ },
-/* 222 */
-/***/ function(module, exports) {
+/* 224 */
+/***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Copyright (c) 2015-present, Parse, LLC.
@@ -28679,33 +28951,837 @@
 
 	'use strict';
 
+	var _WeakMap = __webpack_require__(225)['default'];
+
+	var _interopRequireWildcard = __webpack_require__(165)['default'];
+
+	var _interopRequireDefault = __webpack_require__(164)['default'];
+
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	exports['default'] = parseDate;
+	exports.getState = getState;
+	exports.initializeState = initializeState;
+	exports.removeState = removeState;
+	exports.getServerData = getServerData;
+	exports.setServerData = setServerData;
+	exports.getPendingOps = getPendingOps;
+	exports.setPendingOp = setPendingOp;
+	exports.pushPendingState = pushPendingState;
+	exports.popPendingState = popPendingState;
+	exports.mergeFirstPendingState = mergeFirstPendingState;
+	exports.getObjectCache = getObjectCache;
+	exports.estimateAttribute = estimateAttribute;
+	exports.estimateAttributes = estimateAttributes;
+	exports.commitServerChanges = commitServerChanges;
+	exports.enqueueTask = enqueueTask;
+	exports.clearAllState = clearAllState;
 
-	function parseDate(iso8601) {
-	  var regexp = new RegExp('^([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2})' + 'T' + '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})' + '(.([0-9]+))?' + 'Z$');
-	  var match = regexp.exec(iso8601);
-	  if (!match) {
-	    return null;
-	  }
+	var _ObjectStateMutations = __webpack_require__(222);
 
-	  var year = match[1] || 0;
-	  var month = (match[2] || 1) - 1;
-	  var day = match[3] || 0;
-	  var hour = match[4] || 0;
-	  var minute = match[5] || 0;
-	  var second = match[6] || 0;
-	  var milli = match[8] || 0;
+	var ObjectStateMutations = _interopRequireWildcard(_ObjectStateMutations);
 
-	  return new Date(Date.UTC(year, month, day, hour, minute, second, milli));
+	var _TaskQueue = __webpack_require__(223);
+
+	var _TaskQueue2 = _interopRequireDefault(_TaskQueue);
+
+	var objectState = new _WeakMap();
+
+	function getState(obj) {
+	  var classData = objectState.get(obj);
+	  return classData || null;
 	}
 
-	module.exports = exports['default'];
+	function initializeState(obj, initial) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state;
+	  }
+	  if (!initial) {
+	    initial = {
+	      serverData: {},
+	      pendingOps: [{}],
+	      objectCache: {},
+	      tasks: new _TaskQueue2['default'](),
+	      existed: false
+	    };
+	  }
+	  state = initial;
+	  objectState.set(obj, state);
+	  return state;
+	}
+
+	function removeState(obj) {
+	  var state = getState(obj);
+	  if (state === null) {
+	    return null;
+	  }
+	  objectState['delete'](obj);
+	  return state;
+	}
+
+	function getServerData(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.serverData;
+	  }
+	  return {};
+	}
+
+	function setServerData(obj, attributes) {
+	  var serverData = initializeState(obj).serverData;
+	  ObjectStateMutations.setServerData(serverData, attributes);
+	}
+
+	function getPendingOps(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.pendingOps;
+	  }
+	  return [{}];
+	}
+
+	function setPendingOp(obj, attr, op) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  ObjectStateMutations.setPendingOp(pendingOps, attr, op);
+	}
+
+	function pushPendingState(obj) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  ObjectStateMutations.pushPendingState(pendingOps);
+	}
+
+	function popPendingState(obj) {
+	  var pendingOps = initializeState(obj).pendingOps;
+	  return ObjectStateMutations.popPendingState(pendingOps);
+	}
+
+	function mergeFirstPendingState(obj) {
+	  var pendingOps = getPendingOps(obj);
+	  ObjectStateMutations.mergeFirstPendingState(pendingOps);
+	}
+
+	function getObjectCache(obj) {
+	  var state = getState(obj);
+	  if (state) {
+	    return state.objectCache;
+	  }
+	  return {};
+	}
+
+	function estimateAttribute(obj, attr) {
+	  var serverData = getServerData(obj);
+	  var pendingOps = getPendingOps(obj);
+	  return ObjectStateMutations.estimateAttribute(serverData, pendingOps, obj.className, obj.id, attr);
+	}
+
+	function estimateAttributes(obj) {
+	  var serverData = getServerData(obj);
+	  var pendingOps = getPendingOps(obj);
+	  return ObjectStateMutations.estimateAttributes(serverData, pendingOps, obj.className, obj.id);
+	}
+
+	function commitServerChanges(obj, changes) {
+	  var state = initializeState(obj);
+	  ObjectStateMutations.commitServerChanges(state.serverData, state.objectCache, changes);
+	}
+
+	function enqueueTask(obj, task) {
+	  var state = initializeState(obj);
+	  return state.tasks.enqueue(task);
+	}
+
+	function clearAllState() {
+	  objectState = new _WeakMap();
+	}
 
 /***/ },
-/* 223 */
+/* 225 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(226), __esModule: true };
+
+/***/ },
+/* 226 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(227);
+	__webpack_require__(228);
+	__webpack_require__(245);
+	module.exports = __webpack_require__(181).WeakMap;
+
+/***/ },
+/* 227 */
+/***/ function(module, exports) {
+
+	
+
+/***/ },
+/* 228 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(229);
+	var Iterators = __webpack_require__(232);
+	Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+
+/***/ },
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var addToUnscopables = __webpack_require__(230)
+	  , step             = __webpack_require__(231)
+	  , Iterators        = __webpack_require__(232)
+	  , toIObject        = __webpack_require__(190);
+
+	// 22.1.3.4 Array.prototype.entries()
+	// 22.1.3.13 Array.prototype.keys()
+	// 22.1.3.29 Array.prototype.values()
+	// 22.1.3.30 Array.prototype[@@iterator]()
+	module.exports = __webpack_require__(233)(Array, 'Array', function(iterated, kind){
+	  this._t = toIObject(iterated); // target
+	  this._i = 0;                   // next index
+	  this._k = kind;                // kind
+	// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
+	}, function(){
+	  var O     = this._t
+	    , kind  = this._k
+	    , index = this._i++;
+	  if(!O || index >= O.length){
+	    this._t = undefined;
+	    return step(1);
+	  }
+	  if(kind == 'keys'  )return step(0, index);
+	  if(kind == 'values')return step(0, O[index]);
+	  return step(0, [index, O[index]]);
+	}, 'values');
+
+	// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
+	Iterators.Arguments = Iterators.Array;
+
+	addToUnscopables('keys');
+	addToUnscopables('values');
+	addToUnscopables('entries');
+
+/***/ },
+/* 230 */
+/***/ function(module, exports) {
+
+	module.exports = function(){ /* empty */ };
+
+/***/ },
+/* 231 */
+/***/ function(module, exports) {
+
+	module.exports = function(done, value){
+	  return {value: value, done: !!done};
+	};
+
+/***/ },
+/* 232 */
+/***/ function(module, exports) {
+
+	module.exports = {};
+
+/***/ },
+/* 233 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var LIBRARY        = __webpack_require__(234)
+	  , $export        = __webpack_require__(179)
+	  , redefine       = __webpack_require__(235)
+	  , hide           = __webpack_require__(236)
+	  , has            = __webpack_require__(239)
+	  , Iterators      = __webpack_require__(232)
+	  , $iterCreate    = __webpack_require__(240)
+	  , setToStringTag = __webpack_require__(241)
+	  , getProto       = __webpack_require__(171).getProto
+	  , ITERATOR       = __webpack_require__(242)('iterator')
+	  , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
+	  , FF_ITERATOR    = '@@iterator'
+	  , KEYS           = 'keys'
+	  , VALUES         = 'values';
+
+	var returnThis = function(){ return this; };
+
+	module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED){
+	  $iterCreate(Constructor, NAME, next);
+	  var getMethod = function(kind){
+	    if(!BUGGY && kind in proto)return proto[kind];
+	    switch(kind){
+	      case KEYS: return function keys(){ return new Constructor(this, kind); };
+	      case VALUES: return function values(){ return new Constructor(this, kind); };
+	    } return function entries(){ return new Constructor(this, kind); };
+	  };
+	  var TAG        = NAME + ' Iterator'
+	    , DEF_VALUES = DEFAULT == VALUES
+	    , VALUES_BUG = false
+	    , proto      = Base.prototype
+	    , $native    = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT]
+	    , $default   = $native || getMethod(DEFAULT)
+	    , methods, key;
+	  // Fix native
+	  if($native){
+	    var IteratorPrototype = getProto($default.call(new Base));
+	    // Set @@toStringTag to native iterators
+	    setToStringTag(IteratorPrototype, TAG, true);
+	    // FF fix
+	    if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
+	    // fix Array#{values, @@iterator}.name in V8 / FF
+	    if(DEF_VALUES && $native.name !== VALUES){
+	      VALUES_BUG = true;
+	      $default = function values(){ return $native.call(this); };
+	    }
+	  }
+	  // Define iterator
+	  if((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])){
+	    hide(proto, ITERATOR, $default);
+	  }
+	  // Plug for library
+	  Iterators[NAME] = $default;
+	  Iterators[TAG]  = returnThis;
+	  if(DEFAULT){
+	    methods = {
+	      values:  DEF_VALUES  ? $default : getMethod(VALUES),
+	      keys:    IS_SET      ? $default : getMethod(KEYS),
+	      entries: !DEF_VALUES ? $default : getMethod('entries')
+	    };
+	    if(FORCED)for(key in methods){
+	      if(!(key in proto))redefine(proto, key, methods[key]);
+	    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+	  }
+	  return methods;
+	};
+
+/***/ },
+/* 234 */
+/***/ function(module, exports) {
+
+	module.exports = true;
+
+/***/ },
+/* 235 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(236);
+
+/***/ },
+/* 236 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $          = __webpack_require__(171)
+	  , createDesc = __webpack_require__(237);
+	module.exports = __webpack_require__(238) ? function(object, key, value){
+	  return $.setDesc(object, key, createDesc(1, value));
+	} : function(object, key, value){
+	  object[key] = value;
+	  return object;
+	};
+
+/***/ },
+/* 237 */
+/***/ function(module, exports) {
+
+	module.exports = function(bitmap, value){
+	  return {
+	    enumerable  : !(bitmap & 1),
+	    configurable: !(bitmap & 2),
+	    writable    : !(bitmap & 4),
+	    value       : value
+	  };
+	};
+
+/***/ },
+/* 238 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Thank's IE8 for his funny defineProperty
+	module.exports = !__webpack_require__(184)(function(){
+	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
+	});
+
+/***/ },
+/* 239 */
+/***/ function(module, exports) {
+
+	var hasOwnProperty = {}.hasOwnProperty;
+	module.exports = function(it, key){
+	  return hasOwnProperty.call(it, key);
+	};
+
+/***/ },
+/* 240 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $              = __webpack_require__(171)
+	  , descriptor     = __webpack_require__(237)
+	  , setToStringTag = __webpack_require__(241)
+	  , IteratorPrototype = {};
+
+	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+	__webpack_require__(236)(IteratorPrototype, __webpack_require__(242)('iterator'), function(){ return this; });
+
+	module.exports = function(Constructor, NAME, next){
+	  Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
+	  setToStringTag(Constructor, NAME + ' Iterator');
+	};
+
+/***/ },
+/* 241 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var def = __webpack_require__(171).setDesc
+	  , has = __webpack_require__(239)
+	  , TAG = __webpack_require__(242)('toStringTag');
+
+	module.exports = function(it, tag, stat){
+	  if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
+	};
+
+/***/ },
+/* 242 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var store  = __webpack_require__(243)('wks')
+	  , uid    = __webpack_require__(244)
+	  , Symbol = __webpack_require__(180).Symbol;
+	module.exports = function(name){
+	  return store[name] || (store[name] =
+	    Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+	};
+
+/***/ },
+/* 243 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global = __webpack_require__(180)
+	  , SHARED = '__core-js_shared__'
+	  , store  = global[SHARED] || (global[SHARED] = {});
+	module.exports = function(key){
+	  return store[key] || (store[key] = {});
+	};
+
+/***/ },
+/* 244 */
+/***/ function(module, exports) {
+
+	var id = 0
+	  , px = Math.random();
+	module.exports = function(key){
+	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+	};
+
+/***/ },
+/* 245 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $            = __webpack_require__(171)
+	  , redefine     = __webpack_require__(235)
+	  , weak         = __webpack_require__(246)
+	  , isObject     = __webpack_require__(200)
+	  , has          = __webpack_require__(239)
+	  , frozenStore  = weak.frozenStore
+	  , WEAK         = weak.WEAK
+	  , isExtensible = Object.isExtensible || isObject
+	  , tmp          = {};
+
+	// 23.3 WeakMap Objects
+	var $WeakMap = __webpack_require__(259)('WeakMap', function(get){
+	  return function WeakMap(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+	}, {
+	  // 23.3.3.3 WeakMap.prototype.get(key)
+	  get: function get(key){
+	    if(isObject(key)){
+	      if(!isExtensible(key))return frozenStore(this).get(key);
+	      if(has(key, WEAK))return key[WEAK][this._i];
+	    }
+	  },
+	  // 23.3.3.5 WeakMap.prototype.set(key, value)
+	  set: function set(key, value){
+	    return weak.def(this, key, value);
+	  }
+	}, weak, true, true);
+
+	// IE11 WeakMap frozen keys fix
+	if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
+	  $.each.call(['delete', 'has', 'get', 'set'], function(key){
+	    var proto  = $WeakMap.prototype
+	      , method = proto[key];
+	    redefine(proto, key, function(a, b){
+	      // store frozen objects on leaky map
+	      if(isObject(a) && !isExtensible(a)){
+	        var result = frozenStore(this)[key](a, b);
+	        return key == 'set' ? this : result;
+	      // store all the rest on native weakmap
+	      } return method.call(this, a, b);
+	    });
+	  });
+	}
+
+/***/ },
+/* 246 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var hide              = __webpack_require__(236)
+	  , redefineAll       = __webpack_require__(247)
+	  , anObject          = __webpack_require__(201)
+	  , isObject          = __webpack_require__(200)
+	  , strictNew         = __webpack_require__(248)
+	  , forOf             = __webpack_require__(249)
+	  , createArrayMethod = __webpack_require__(256)
+	  , $has              = __webpack_require__(239)
+	  , WEAK              = __webpack_require__(244)('weak')
+	  , isExtensible      = Object.isExtensible || isObject
+	  , arrayFind         = createArrayMethod(5)
+	  , arrayFindIndex    = createArrayMethod(6)
+	  , id                = 0;
+
+	// fallback for frozen keys
+	var frozenStore = function(that){
+	  return that._l || (that._l = new FrozenStore);
+	};
+	var FrozenStore = function(){
+	  this.a = [];
+	};
+	var findFrozen = function(store, key){
+	  return arrayFind(store.a, function(it){
+	    return it[0] === key;
+	  });
+	};
+	FrozenStore.prototype = {
+	  get: function(key){
+	    var entry = findFrozen(this, key);
+	    if(entry)return entry[1];
+	  },
+	  has: function(key){
+	    return !!findFrozen(this, key);
+	  },
+	  set: function(key, value){
+	    var entry = findFrozen(this, key);
+	    if(entry)entry[1] = value;
+	    else this.a.push([key, value]);
+	  },
+	  'delete': function(key){
+	    var index = arrayFindIndex(this.a, function(it){
+	      return it[0] === key;
+	    });
+	    if(~index)this.a.splice(index, 1);
+	    return !!~index;
+	  }
+	};
+
+	module.exports = {
+	  getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
+	    var C = wrapper(function(that, iterable){
+	      strictNew(that, C, NAME);
+	      that._i = id++;      // collection id
+	      that._l = undefined; // leak store for frozen objects
+	      if(iterable != undefined)forOf(iterable, IS_MAP, that[ADDER], that);
+	    });
+	    redefineAll(C.prototype, {
+	      // 23.3.3.2 WeakMap.prototype.delete(key)
+	      // 23.4.3.3 WeakSet.prototype.delete(value)
+	      'delete': function(key){
+	        if(!isObject(key))return false;
+	        if(!isExtensible(key))return frozenStore(this)['delete'](key);
+	        return $has(key, WEAK) && $has(key[WEAK], this._i) && delete key[WEAK][this._i];
+	      },
+	      // 23.3.3.4 WeakMap.prototype.has(key)
+	      // 23.4.3.4 WeakSet.prototype.has(value)
+	      has: function has(key){
+	        if(!isObject(key))return false;
+	        if(!isExtensible(key))return frozenStore(this).has(key);
+	        return $has(key, WEAK) && $has(key[WEAK], this._i);
+	      }
+	    });
+	    return C;
+	  },
+	  def: function(that, key, value){
+	    if(!isExtensible(anObject(key))){
+	      frozenStore(that).set(key, value);
+	    } else {
+	      $has(key, WEAK) || hide(key, WEAK, {});
+	      key[WEAK][that._i] = value;
+	    } return that;
+	  },
+	  frozenStore: frozenStore,
+	  WEAK: WEAK
+	};
+
+/***/ },
+/* 247 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var redefine = __webpack_require__(235);
+	module.exports = function(target, src){
+	  for(var key in src)redefine(target, key, src[key]);
+	  return target;
+	};
+
+/***/ },
+/* 248 */
+/***/ function(module, exports) {
+
+	module.exports = function(it, Constructor, name){
+	  if(!(it instanceof Constructor))throw TypeError(name + ": use the 'new' operator!");
+	  return it;
+	};
+
+/***/ },
+/* 249 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ctx         = __webpack_require__(182)
+	  , call        = __webpack_require__(250)
+	  , isArrayIter = __webpack_require__(251)
+	  , anObject    = __webpack_require__(201)
+	  , toLength    = __webpack_require__(252)
+	  , getIterFn   = __webpack_require__(254);
+	module.exports = function(iterable, entries, fn, that){
+	  var iterFn = getIterFn(iterable)
+	    , f      = ctx(fn, that, entries ? 2 : 1)
+	    , index  = 0
+	    , length, step, iterator;
+	  if(typeof iterFn != 'function')throw TypeError(iterable + ' is not iterable!');
+	  // fast case for arrays with default iterator
+	  if(isArrayIter(iterFn))for(length = toLength(iterable.length); length > index; index++){
+	    entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+	  } else for(iterator = iterFn.call(iterable); !(step = iterator.next()).done; ){
+	    call(iterator, f, step.value, entries);
+	  }
+	};
+
+/***/ },
+/* 250 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// call something on iterator step with safe closing on error
+	var anObject = __webpack_require__(201);
+	module.exports = function(iterator, fn, value, entries){
+	  try {
+	    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+	  // 7.4.6 IteratorClose(iterator, completion)
+	  } catch(e){
+	    var ret = iterator['return'];
+	    if(ret !== undefined)anObject(ret.call(iterator));
+	    throw e;
+	  }
+	};
+
+/***/ },
+/* 251 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// check on default Array iterator
+	var Iterators  = __webpack_require__(232)
+	  , ITERATOR   = __webpack_require__(242)('iterator')
+	  , ArrayProto = Array.prototype;
+
+	module.exports = function(it){
+	  return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
+	};
+
+/***/ },
+/* 252 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 7.1.15 ToLength
+	var toInteger = __webpack_require__(253)
+	  , min       = Math.min;
+	module.exports = function(it){
+	  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+	};
+
+/***/ },
+/* 253 */
+/***/ function(module, exports) {
+
+	// 7.1.4 ToInteger
+	var ceil  = Math.ceil
+	  , floor = Math.floor;
+	module.exports = function(it){
+	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+	};
+
+/***/ },
+/* 254 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var classof   = __webpack_require__(255)
+	  , ITERATOR  = __webpack_require__(242)('iterator')
+	  , Iterators = __webpack_require__(232);
+	module.exports = __webpack_require__(181).getIteratorMethod = function(it){
+	  if(it != undefined)return it[ITERATOR]
+	    || it['@@iterator']
+	    || Iterators[classof(it)];
+	};
+
+/***/ },
+/* 255 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// getting tag from 19.1.3.6 Object.prototype.toString()
+	var cof = __webpack_require__(192)
+	  , TAG = __webpack_require__(242)('toStringTag')
+	  // ES3 wrong here
+	  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
+
+	module.exports = function(it){
+	  var O, T, B;
+	  return it === undefined ? 'Undefined' : it === null ? 'Null'
+	    // @@toStringTag case
+	    : typeof (T = (O = Object(it))[TAG]) == 'string' ? T
+	    // builtinTag case
+	    : ARG ? cof(O)
+	    // ES3 arguments fallback
+	    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+	};
+
+/***/ },
+/* 256 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 0 -> Array#forEach
+	// 1 -> Array#map
+	// 2 -> Array#filter
+	// 3 -> Array#some
+	// 4 -> Array#every
+	// 5 -> Array#find
+	// 6 -> Array#findIndex
+	var ctx      = __webpack_require__(182)
+	  , IObject  = __webpack_require__(191)
+	  , toObject = __webpack_require__(176)
+	  , toLength = __webpack_require__(252)
+	  , asc      = __webpack_require__(257);
+	module.exports = function(TYPE){
+	  var IS_MAP        = TYPE == 1
+	    , IS_FILTER     = TYPE == 2
+	    , IS_SOME       = TYPE == 3
+	    , IS_EVERY      = TYPE == 4
+	    , IS_FIND_INDEX = TYPE == 6
+	    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX;
+	  return function($this, callbackfn, that){
+	    var O      = toObject($this)
+	      , self   = IObject(O)
+	      , f      = ctx(callbackfn, that, 3)
+	      , length = toLength(self.length)
+	      , index  = 0
+	      , result = IS_MAP ? asc($this, length) : IS_FILTER ? asc($this, 0) : undefined
+	      , val, res;
+	    for(;length > index; index++)if(NO_HOLES || index in self){
+	      val = self[index];
+	      res = f(val, index, O);
+	      if(TYPE){
+	        if(IS_MAP)result[index] = res;            // map
+	        else if(res)switch(TYPE){
+	          case 3: return true;                    // some
+	          case 5: return val;                     // find
+	          case 6: return index;                   // findIndex
+	          case 2: result.push(val);               // filter
+	        } else if(IS_EVERY)return false;          // every
+	      }
+	    }
+	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+	  };
+	};
+
+/***/ },
+/* 257 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+	var isObject = __webpack_require__(200)
+	  , isArray  = __webpack_require__(258)
+	  , SPECIES  = __webpack_require__(242)('species');
+	module.exports = function(original, length){
+	  var C;
+	  if(isArray(original)){
+	    C = original.constructor;
+	    // cross-realm fallback
+	    if(typeof C == 'function' && (C === Array || isArray(C.prototype)))C = undefined;
+	    if(isObject(C)){
+	      C = C[SPECIES];
+	      if(C === null)C = undefined;
+	    }
+	  } return new (C === undefined ? Array : C)(length);
+	};
+
+/***/ },
+/* 258 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 7.2.2 IsArray(argument)
+	var cof = __webpack_require__(192);
+	module.exports = Array.isArray || function(arg){
+	  return cof(arg) == 'Array';
+	};
+
+/***/ },
+/* 259 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $              = __webpack_require__(171)
+	  , global         = __webpack_require__(180)
+	  , $export        = __webpack_require__(179)
+	  , fails          = __webpack_require__(184)
+	  , hide           = __webpack_require__(236)
+	  , redefineAll    = __webpack_require__(247)
+	  , forOf          = __webpack_require__(249)
+	  , strictNew      = __webpack_require__(248)
+	  , isObject       = __webpack_require__(200)
+	  , setToStringTag = __webpack_require__(241)
+	  , DESCRIPTORS    = __webpack_require__(238);
+
+	module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
+	  var Base  = global[NAME]
+	    , C     = Base
+	    , ADDER = IS_MAP ? 'set' : 'add'
+	    , proto = C && C.prototype
+	    , O     = {};
+	  if(!DESCRIPTORS || typeof C != 'function' || !(IS_WEAK || proto.forEach && !fails(function(){
+	    new C().entries().next();
+	  }))){
+	    // create collection constructor
+	    C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+	    redefineAll(C.prototype, methods);
+	  } else {
+	    C = wrapper(function(target, iterable){
+	      strictNew(target, C, NAME);
+	      target._c = new Base;
+	      if(iterable != undefined)forOf(iterable, IS_MAP, target[ADDER], target);
+	    });
+	    $.each.call('add,clear,delete,forEach,get,has,set,keys,values,entries'.split(','),function(KEY){
+	      var IS_ADDER = KEY == 'add' || KEY == 'set';
+	      if(KEY in proto && !(IS_WEAK && KEY == 'clear'))hide(C.prototype, KEY, function(a, b){
+	        if(!IS_ADDER && IS_WEAK && !isObject(a))return KEY == 'get' ? undefined : false;
+	        var result = this._c[KEY](a === 0 ? 0 : a, b);
+	        return IS_ADDER ? this : result;
+	      });
+	    });
+	    if('size' in proto)$.setDesc(C.prototype, 'size', {
+	      get: function(){
+	        return this._c.size;
+	      }
+	    });
+	  }
+
+	  setToStringTag(C, NAME);
+
+	  O[NAME] = C;
+	  $export($export.G + $export.W + $export.F, O);
+
+	  if(!IS_WEAK)common.setStrong(C, NAME, IS_MAP);
+
+	  return C;
+	};
+
+/***/ },
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28807,7 +29883,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 224 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28835,8 +29911,6 @@
 
 	var _interopRequireDefault = __webpack_require__(164)['default'];
 
-	var _interopRequireWildcard = __webpack_require__(165)['default'];
-
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
@@ -28845,13 +29919,9 @@
 
 	var _CoreManager2 = _interopRequireDefault(_CoreManager);
 
-	var _isRevocableSession = __webpack_require__(225);
+	var _isRevocableSession = __webpack_require__(262);
 
 	var _isRevocableSession2 = _interopRequireDefault(_isRevocableSession);
-
-	var _ObjectState = __webpack_require__(220);
-
-	var ObjectState = _interopRequireWildcard(_ObjectState);
 
 	var _ParseError = __webpack_require__(202);
 
@@ -28865,11 +29935,11 @@
 
 	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
 
-	var _ParseSession = __webpack_require__(226);
+	var _ParseSession = __webpack_require__(263);
 
 	var _ParseSession2 = _interopRequireDefault(_ParseSession);
 
-	var _Storage = __webpack_require__(227);
+	var _Storage = __webpack_require__(264);
 
 	var _Storage2 = _interopRequireDefault(_Storage);
 
@@ -29760,6 +30830,7 @@
 
 	  logIn: function logIn(user, options) {
 	    var RESTController = _CoreManager2['default'].getRESTController();
+	    var stateController = _CoreManager2['default'].getObjectStateController();
 	    var auth = {
 	      username: user.get('username'),
 	      password: user.get('password')
@@ -29767,8 +30838,8 @@
 	    return RESTController.request('GET', 'login', auth, options).then(function (response, status) {
 	      user._migrateId(response.objectId);
 	      user._setExisted(true);
-	      ObjectState.setPendingOp(user.className, user._getId(), 'username', undefined);
-	      ObjectState.setPendingOp(user.className, user._getId(), 'password', undefined);
+	      stateController.setPendingOp(user._getStateIdentifier(), 'username', undefined);
+	      stateController.setPendingOp(user._getStateIdentifier(), 'password', undefined);
 	      response.password = undefined;
 	      user._finishFetch(response);
 	      if (!canUseCurrentUser) {
@@ -29850,7 +30921,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 225 */
+/* 262 */
 /***/ function(module, exports) {
 
 	/**
@@ -29878,7 +30949,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 226 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29920,7 +30991,7 @@
 
 	var _CoreManager2 = _interopRequireDefault(_CoreManager);
 
-	var _isRevocableSession = __webpack_require__(225);
+	var _isRevocableSession = __webpack_require__(262);
 
 	var _isRevocableSession2 = _interopRequireDefault(_isRevocableSession);
 
@@ -29932,7 +31003,7 @@
 
 	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
 
-	var _ParseUser = __webpack_require__(224);
+	var _ParseUser = __webpack_require__(261);
 
 	var _ParseUser2 = _interopRequireDefault(_ParseUser);
 
@@ -30038,7 +31109,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 227 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30139,10 +31210,10 @@
 	  }
 	};
 
-	_CoreManager2['default'].setStorageController(__webpack_require__(228));
+	_CoreManager2['default'].setStorageController(__webpack_require__(265));
 
 /***/ },
-/* 228 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30189,7 +31260,7 @@
 	};
 
 /***/ },
-/* 229 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30215,7 +31286,7 @@
 
 	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
 
-	var _Storage = __webpack_require__(227);
+	var _Storage = __webpack_require__(264);
 
 	var _Storage2 = _interopRequireDefault(_Storage);
 
@@ -30258,7 +31329,7 @@
 	};
 
 /***/ },
-/* 230 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -30292,7 +31363,7 @@
 
 	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
 
-	var _Storage = __webpack_require__(227);
+	var _Storage = __webpack_require__(264);
 
 	var _Storage2 = _interopRequireDefault(_Storage);
 
@@ -30496,7 +31567,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 231 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30588,7 +31659,7 @@
 	});
 
 /***/ },
-/* 232 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30701,7 +31772,7 @@
 	});
 
 /***/ },
-/* 233 */
+/* 270 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30751,7 +31822,7 @@
 
 	var _ParsePromise2 = _interopRequireDefault(_ParsePromise);
 
-	var _Storage = __webpack_require__(227);
+	var _Storage = __webpack_require__(264);
 
 	var _Storage2 = _interopRequireDefault(_Storage);
 
@@ -30920,7 +31991,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 234 */
+/* 271 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30942,11 +32013,11 @@
 	  value: true
 	});
 
-	var _parseDate = __webpack_require__(222);
+	var _parseDate = __webpack_require__(220);
 
 	var _parseDate2 = _interopRequireDefault(_parseDate);
 
-	var _ParseUser = __webpack_require__(224);
+	var _ParseUser = __webpack_require__(261);
 
 	var _ParseUser2 = _interopRequireDefault(_ParseUser);
 
@@ -31165,7 +32236,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 235 */
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31220,7 +32291,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 236 */
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31315,7 +32386,7 @@
 	});
 
 /***/ },
-/* 237 */
+/* 274 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -35306,7 +36377,7 @@
 
 
 /***/ },
-/* 238 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {

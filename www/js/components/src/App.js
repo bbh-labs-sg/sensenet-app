@@ -72,7 +72,7 @@ class App extends React.Component {
 	}
 	state = {
 		user: null,
-	}
+	};
 	componentDidMount() {
 		this.reloadCurrentUser();
 
@@ -92,11 +92,11 @@ class App extends React.Component {
 	onPause = () => {
 		this.refs.deviceManager.onPause();
 		this.refs.networkManager.onPause();
-	}
+	};
 	onResume = () => {
 		this.refs.deviceManager.onResume();
 		this.refs.networkManager.onResume();
-	}
+	};
 	reloadCurrentUser = () => {
 		let currentUser = Parse.User.current();
 		if (currentUser) {
@@ -105,7 +105,7 @@ class App extends React.Component {
 			this.refs.networkManager.destroyPusher();
 		}
 		this.setState({ user: currentUser });
-	}
+	};
 }
 
 class DeviceManager extends React.Component {
@@ -115,7 +115,7 @@ class DeviceManager extends React.Component {
 	state = {
 		deviceState: STATE_NOT_CONNECTED,
 		deviceID: null,
-	}
+	};
 	onPause() {
 		this.cancelLookForDevice();
 		bluetoothSerial.disconnect();
@@ -133,18 +133,18 @@ class DeviceManager extends React.Component {
 			this.setState({ deviceState: STATE_LISTING_DEVICES });
 			toastr.info('Looking for a SenseNet device..', '', { timeOut: 2000 });
 		}
-	}
+	};
 	startLookForDevice = () => {
 		if (!this.lookForDeviceIntervalID) {
 			this.lookForDeviceIntervalID = setInterval(this.lookForDevice, 5000);
 		}
-	}
+	};
 	cancelLookForDevice = () => {
 		if (this.lookForDeviceIntervalID) {
 			clearInterval(this.lookForDeviceIntervalID);
 		}
 		this.lookForDeviceIntervalID = null;
-	}
+	};
 	sendSensorReading = (deviceID, data, coordinate) => {
 		dispatcher.dispatch({
 			type: 'sendSensorReading',
@@ -152,7 +152,7 @@ class DeviceManager extends React.Component {
 			data: data,
 			coordinate: coordinate,
 		});
-	}
+	};
 	onBluetoothListSuccess = (devices) => {
 		for (let i in devices) {
 			if (devices[i].name == 'SenseNet') {
@@ -163,20 +163,20 @@ class DeviceManager extends React.Component {
 		}
 		this.setState({ deviceState: STATE_NOT_FOUND });
 		toastr.error('Couldn\'t find a SenseNet device', '', { timeOut: 3000 });
-	}
+	};
 	onBluetoothListFailure = () => {
 		this.setState({ deviceState: STATE_NOT_CONNECTED });
 		setTimeout(this.lookForDevice, 5000);
-	}
+	};
 	onBluetoothConnectSuccess = () => {
 		this.setState({ deviceState: STATE_CONNECTED });
 		bluetoothSerial.subscribe('\r\n', this.onBluetoothDataSuccess, this.onBluetoothDataFailure);
 		toastr.success('Connected to a SenseNet device!', '', { timeOut: 3000 });
-	}
+	};
 	onBluetoothConnectFailure = () => {
 		this.setState({ deviceState: STATE_NOT_CONNECTED });
 		toastr.error('Failed to connect the SenseNet device!', '', { timeOut: 3000 });
-	}
+	};
 	onBluetoothDataSuccess = (rawData) => {
 		try {
 			this.data = null;
@@ -189,16 +189,16 @@ class DeviceManager extends React.Component {
 		} catch (error) {
 			// do nothing
 		}
-	}
+	};
 	onBluetoothDataFailure = () => {
 		// do nothing
-	}
+	};
 	onGetCurrentPositionSuccess = (position) => {
 		this.sendSensorReading(this.state.deviceID, this.data, position.coords);
-	}
+	};
 	onGetCurrentPositionError = (error) => {
 		toastr.error('Failed to get GPS position', '', { timeOut: 1000 });
-	}
+	};
 }
 
 class NetworkManager extends React.Component {
@@ -230,9 +230,9 @@ class NetworkManager extends React.Component {
 		dispatcher.unregister(this.listenerID);
 	}
 	onPause = () => {
-	}
+	};
 	onResume = () => {
-	}
+	};
 	sendSensorReading = (deviceID, data, coordinate) => {
 		if (!(!!deviceID && !!data && !!coordinate)) {
 			return;
@@ -263,7 +263,7 @@ class NetworkManager extends React.Component {
 				// do nothing
 			},
 		});
-	}
+	};
 	sendSensorReadingRealtime(deviceID, data, coordinate) {
 		channel.trigger('client-reading', {
 			deviceID: deviceID,
@@ -288,7 +288,7 @@ class NetworkManager extends React.Component {
 		};
 
 		this.sendSensorReading('71GM9xi757', data, position.coords);
-	}
+	};
 	initPusher() {
 		pusher = new Pusher('ae0834efadeb12c41af8', {
 			authEndpoint: 'https://sensenet.bbh-labs.com.sg/pusher/auth',
@@ -356,7 +356,7 @@ class Authentication extends React.Component {
 		loggingIn: false,
 		signingUp: false,
 		resettingPassword: false,
-	}
+	};
 	componentDidMount() {
 		dispatcher.dispatch({ type: 'reloadCurrentUser' });
 	}
@@ -375,7 +375,7 @@ class Authentication extends React.Component {
 				this.setState({ loggingIn: false });
 			},
 		});
-	}
+	};
 	signup = (event) => {
 		event.preventDefault();
 
@@ -397,7 +397,7 @@ class Authentication extends React.Component {
 				toastr.error('Error: ' + error.code + ' ' + error.message);
 			},
 		});
-	}
+	};
 	resetPassword = (event) => {
 		event.preventDefault();
 
@@ -413,14 +413,14 @@ class Authentication extends React.Component {
 				toastr.error('Error: ' + error.code + ' ' + error.message);
 			}
 		});
-	}
+	};
 }
 
 class Dashboard extends React.Component {
 	state = {
 		page: 'overview',
 		devices: null,
-	}
+	};
 	render() {
 		let page = null;
 
@@ -516,7 +516,7 @@ class MyDevice extends React.Component {
 	}
 	state = {
 		readings: [ null,null,null,null,null,null,null,null,null,null ],
-	}
+	};
 	componentDidMount() {
 		let device = this.props.device;
 
@@ -533,7 +533,6 @@ class MyDevice extends React.Component {
 			labels: this.readingLabels(),
 			series: this.readingSeries(),
 		}, {
-			fullWidth: true,
 			lineSmooth: Chartist.Interpolation.cardinal({
 				fillHoles: true,
 			}),
@@ -556,12 +555,12 @@ class MyDevice extends React.Component {
 				fillHoles: true,
 			}),
 		});
-	}
+	};
 	readingLabels = () => {
 		return this.state.readings.map(function(r, i) {
 			return i;
 		});
-	}
+	};
 	readingSeries = () => {
 		let readings = this.state.readings;
 		let series = [];
@@ -588,7 +587,7 @@ class MyDevice extends React.Component {
 		}));
 
 		return series;
-	}
+	};
 }
 
 class Device extends React.Component {
@@ -605,7 +604,7 @@ class Device extends React.Component {
 	}
 	state = {
 		readings: [ null,null,null,null,null,null,null,null,null,null ]
-	}
+	};
 	componentDidMount() {
 		let device = this.props.device;
 
@@ -647,15 +646,15 @@ class Device extends React.Component {
 				fillHoles: true,
 			}),
 		});
-	}
+	};
 	readingID = () => {
 		return 'reading-' + this.props.device.id;
-	}
+	};
 	readingLabels = () => {
 		return this.state.readings.map(function(r, i) {
 			return i;
 		});
-	}
+	};
 	readingSeries = () => {
 		let readings = this.state.readings;
 		let series = [];
@@ -682,7 +681,7 @@ class Device extends React.Component {
 		}));
 
 		return series;
-	}
+	};
 }
 
 class Settings extends React.Component {
@@ -743,7 +742,7 @@ class Settings extends React.Component {
 	state = {
 		changingPassword: false,
 		changingEmail: false,
-	}
+	};
 	changePassword = (event) => {
 		event.preventDefault();
 
@@ -757,14 +756,14 @@ class Settings extends React.Component {
 		// this.setState({ changingPassword: true });
 
 		// TODO: Implement Parse's Change Password
-	}
+	};
 	changeEmail = (event) => {
 		event.preventDefault();
 
 		// this.setState({ changingEmail: true });
 
 		// TODO: Implement Parse's Change Email
-	}
+	};
 }
 
 class Navbar extends React.Component {
@@ -784,8 +783,7 @@ class Navbar extends React.Component {
 		Parse.User.logOut().then(() => {
 			dispatcher.dispatch({ type: 'reloadCurrentUser' });
 		});
-	}
-
+	};
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
