@@ -1,6 +1,3 @@
-// Toggle between Cordova and Web
-const CORDOVA = false;
-
 // React
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -9,29 +6,21 @@ import ReactDOM from 'react-dom'
 import Flux from 'flux'
 let dispatcher = new Flux.Dispatcher();
 
-// Parse
-import Parse from 'parse'
-Parse.initialize(
-	'9sMhGuNUapuBzG4HePZSNUmfRyDegxsXXoAjttUk', // Application ID
-	'D9fEaIKZDPaB9mocOj1xv9OPusKGi1AAvKu2rPi2'  // JavaScript Key
-);
-
 // Pusher
 import Pusher from 'pusher-js'
 let pusher = null,
     channel = null;
 
-// Chartist
-import Chartist from 'chartist'
-
 // Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
+
+// Sensor data buffer
+let sensorDataBuffer;
 
 const STATE_NOT_CONNECTED	= 0,
       STATE_LISTING_DEVICES = 1,
       STATE_CONNECTING		= 2,
-      STATE_CONNECTED		= 3,
-      STATE_NOT_FOUND		= 4;
+      STATE_CONNECTED		= 3;
 
 const LOOK_FOR_DEVICE_INTERVAL = 5000;
 
@@ -52,42 +41,54 @@ function norm(value, min, max) {
 	return (value - min) / (max - min);
 }
 
-class ReadingObject extends Parse.Object {
-	constructor() {
-		super('Reading');
+function indexOf(array, value, start = 0) {
+	for (let i = start; i < array.length; i++) {
+		if (array[i] === value) {
+			return i;
+		}
 	}
+	return -1;
 }
 
 class App extends React.Component {
 	render() {
-		let user = this.state.user;
 		return (
 			<div id='app' className='flex column one'>
-				{ user ? <Navbar /> : null }
-				{ user ? <Dashboard /> : <Authentication /> }
-				<DeviceManager ref='deviceManager' loggedIn={ !!user } />
-				<NetworkManager ref='networkManager' loggedIn={ !!user } />
+				<Navbar />
+				<Dashboard readings={ this.state.readings } connected={ this.state.deviceState == STATE_CONNECTED } />
+				<DeviceManager ref='deviceManager' deviceID={ this.state.deviceID } deviceState={ this.state.deviceState } />
+				<NetworkManager ref='networkManager' />
 			</div>
 		)
 	}
 	state = {
-		user: null,
+		readings: [ null, null, null, null, null, null, null, null, null, null ],
+		deviceID: null,
+		deviceState: STATE_NOT_CONNECTED,
 	};
 	componentDidMount() {
-		this.reloadCurrentUser();
-
-		if (CORDOVA) {
-			document.addEventListener('pause', this.onPause, false);
-			document.addEventListener('resume', this.onResume, false);
-			this.onResume();
-		}
-
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload.type) {
 			case 'reloadCurrentUser':
-				this.reloadCurrentUser(); break;
+				this.reloadCurrentUser();
+				break;
+			case 'sensorReading':
+				let readings = this.state.readings;
+				readings.push(payload.reading);
+				readings.shift();
+				this.setState({ readings: readings });
+				break;
+			case 'deviceID':
+				this.setState({ deviceID: payload.deviceID });
+				break;
+			case 'deviceState':
+				this.setState({ deviceState: payload.deviceState });
+				break;
 			}
 		});
+	}
+	componentWillUnmount() {
+		dispatcher.unregister(this.listenerID);
 	}
 	onPause = () => {
 		this.refs.deviceManager.onPause();
@@ -97,108 +98,193 @@ class App extends React.Component {
 		this.refs.deviceManager.onResume();
 		this.refs.networkManager.onResume();
 	};
-	reloadCurrentUser = () => {
-		let currentUser = Parse.User.current();
-		if (currentUser) {
-			this.refs.networkManager.initPusher();
-		} else {
-			this.refs.networkManager.destroyPusher();
-		}
-		this.setState({ user: currentUser });
-	};
 }
 
 class DeviceManager extends React.Component {
 	render() {
 		return null;
 	}
-	state = {
-		deviceState: STATE_NOT_CONNECTED,
-		deviceID: null,
-	};
+	componentDidMount() {
+		this.listenerID = dispatcher.register((payload) => {
+			switch (payload.type) {
+			case 'connectDevice':
+				this.connectDevice(); break;
+			case 'disconnectDevice':
+				this.disconnectDevice(); break;
+			}
+		});
+	}
+	componentWillUnmount() {
+		dispatcher.unregister(this.listenerID);
+	}
 	onPause() {
-		this.cancelLookForDevice();
-		bluetoothSerial.disconnect();
 	}
 	onResume() {
-		// Look for a device if logged in
-		if (this.props.loggedIn) {
-			this.startLookForDevice();
-		}
 	}
-	lookForDevice = () => {
-		let state = this.state.deviceState;
-		if (state == STATE_NOT_CONNECTED || state == STATE_NOT_FOUND) {
-			bluetoothSerial.list(this.onBluetoothListSuccess, this.onBluetoothListFailure);
-			this.setState({ deviceState: STATE_LISTING_DEVICES });
-			toastr.info('Looking for a SenseNet device..', '', { timeOut: 2000 });
-		}
+	connectDevice = () => {
+		bluetoothSerial.isEnabled(this.onBluetoothEnabled, this.onBluetoothDisabled);
 	};
-	startLookForDevice = () => {
-		if (!this.lookForDeviceIntervalID) {
-			this.lookForDeviceIntervalID = setInterval(this.lookForDevice, 5000);
-		}
+	disconnectDevice = () => {
+		bluetoothSerial.isConnected(
+			() => {
+				bluetoothSerial.disconnect(this.onBluetoothDisconnectSucceeded, this.onBluetoothDisconnectFailed);
+			},
+			() => { }
+		);
 	};
-	cancelLookForDevice = () => {
-		if (this.lookForDeviceIntervalID) {
-			clearInterval(this.lookForDeviceIntervalID);
-		}
-		this.lookForDeviceIntervalID = null;
-	};
-	sendSensorReading = (deviceID, data, coordinate) => {
+	initiateSendSensorReading = (data) => {
 		dispatcher.dispatch({
 			type: 'sendSensorReading',
-			deviceID, deviceID,
 			data: data,
-			coordinate: coordinate,
 		});
 	};
-	onBluetoothListSuccess = (devices) => {
+	onBluetoothEnabled = () => {
+		let state = this.props.deviceState;
+		if (state == STATE_NOT_CONNECTED) {
+			bluetoothSerial.list(this.onBluetoothListSucceeded, this.onBluetoothListFailed);
+			dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_LISTING_DEVICES });
+			toastr.info(
+				'Looking for device..',
+				'If you can\'t connect to the device, try pairing with it first.',
+				{ timeOut: 2000 }
+			);
+		}
+	};
+	onBluetoothDisabled = () => {
+		toastr.error(
+			'Bluetooth is not enabled',
+			'Please go to your phone settings and enable Bluetooth.',
+			{ timeOut: 3000 }
+		);
+	};
+	onBluetoothDisconnectSucceeded = () => {
+		dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_NOT_CONNECTED });
+	};
+	onBluetoothDisconnectFailed = () => {
+		toastr.error('Failed to disconnect the device', '', { timeOut: 3000 });
+	};
+	onBluetoothListSucceeded = (devices) => {
 		for (let i in devices) {
 			if (devices[i].name == 'SenseNet') {
-				this.setState({ deviceState: STATE_CONNECTING });
-				bluetoothSerial.connect(devices[i].address, this.onBluetoothConnectSuccess, this.onBluetoothConnectFailure);
+				dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_CONNECTING });
+				bluetoothSerial.connect(devices[i].address, this.onBluetoothConnectSucceeded, this.onBluetoothConnectFailed);
 				return;
 			}
 		}
-		this.setState({ deviceState: STATE_NOT_FOUND });
+
+		this.onBluetoothConnectFailed();
+	};
+	onBluetoothListFailed = () => {
+		dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_NOT_CONNECTED });
 		toastr.error('Couldn\'t find a SenseNet device', '', { timeOut: 3000 });
 	};
-	onBluetoothListFailure = () => {
-		this.setState({ deviceState: STATE_NOT_CONNECTED });
-		setTimeout(this.lookForDevice, 5000);
-	};
-	onBluetoothConnectSuccess = () => {
-		this.setState({ deviceState: STATE_CONNECTED });
-		bluetoothSerial.subscribe('\r\n', this.onBluetoothDataSuccess, this.onBluetoothDataFailure);
+	onBluetoothConnectSucceeded = () => {
+		dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_CONNECTED });
+		bluetoothSerial.subscribeRawData(this.onBluetoothDataSucceeded, this.onBluetoothDataFailed);
 		toastr.success('Connected to a SenseNet device!', '', { timeOut: 3000 });
 	};
-	onBluetoothConnectFailure = () => {
-		this.setState({ deviceState: STATE_NOT_CONNECTED });
-		toastr.error('Failed to connect the SenseNet device!', '', { timeOut: 3000 });
+	onBluetoothConnectFailed = () => {
+		dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_NOT_CONNECTED });
+		toastr.error('Connection Failed!', 'Couldn\'t connect to the SenseNet device!', { timeOut: 3000 });
 	};
-	onBluetoothDataSuccess = (rawData) => {
-		try {
-			this.data = null;
-			this.data = JSON.parse(rawData);
-			navigator.geolocation.getCurrentPosition(
-				this.onGetCurrentPositionSuccess,
-				this.onGetCurrentPositionError,
-				{ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true }
-			);
-		} catch (error) {
-			// do nothing
+	onBluetoothDataSucceeded = (rawData) => {
+		if (sensorDataBuffer) {
+			let newSensorDataBuffer = new ArrayBuffer(sensorDataBuffer.byteLength + rawData.byteLength);
+			let src1 = new Uint8Array(sensorDataBuffer);
+			let src2 = new Uint8Array(rawData);
+			let dst = new Uint8Array(newSensorDataBuffer);
+			for (let i = 0; i < src1.length; i++) {
+				dst[i] = src1[i];
+			}
+			for (let i = 0; i < src2.length; i++) {
+				dst[i + src1.length] = src2[i];
+			}
+			sensorDataBuffer = newSensorDataBuffer;
+		} else {
+			sensorDataBuffer = rawData;
+		}
+
+		let indexArray = new Uint16Array(sensorDataBuffer);
+		let start = 0;
+		let end = indexOf(indexArray, 0x0A0D, start);
+		let reading;
+
+		// Have to multiply by two to convert int16 index to int8 index
+		while ((end - start) * 2 >= 28) {
+			let workBuffer = sensorDataBuffer.slice(start * 2, end * 2);
+			reading = this.parseData(workBuffer);
+
+			start = end + 1;
+			end = indexOf(indexArray, 0x0A0D, start);
+		}
+
+		if (reading) {
+			this.sendData(reading);
+		}
+
+		let leftoverStart = end >= 0 ? end * 2 : start * 2;
+		let leftoverEnd = indexArray.length * 2;
+		if (leftoverStart >= 0) {
+			let leftoverBuffer = sensorDataBuffer.slice(leftoverStart, leftoverEnd);
+			let newSensorDataBuffer = new ArrayBuffer(leftoverEnd - leftoverStart);
+			let src = new Uint8Array(leftoverBuffer);
+			let dst = new Uint8Array(newSensorDataBuffer);
+			for (let i = 0; i < leftoverBuffer.byteLength; i++) {
+				dst[i] = src[i];
+			}
+			sensorDataBuffer = newSensorDataBuffer;
+		} else {
+			sensorDataBuffer = null;
 		}
 	};
-	onBluetoothDataFailure = () => {
-		// do nothing
+	onBluetoothDataFailed = () => {
+		toastr.error('Bluetooth', 'Failed to get data from the device.', { timeOut: 3000 });
 	};
-	onGetCurrentPositionSuccess = (position) => {
-		this.sendSensorReading(this.state.deviceID, this.data, position.coords);
+	onGetCurrentPositionSucceeded = (position) => {
+		this.data.deviceID = this.props.deviceID;
+		this.data.coordinates = position.coords;
+		this.initiateSendSensorReading(this.data);
 	};
 	onGetCurrentPositionError = (error) => {
-		toastr.error('Failed to get GPS position', '', { timeOut: 1000 });
+		toastr.error('GPS Failed', 'Try going outdoors to get better GPS signal.', { timeOut: 1000 });
 	};
+	parseData = (buffer) => {
+		// Device ID
+		let deviceID = String.fromCharCode.apply(null, new Uint8Array(buffer, 0, 10));
+
+		// Float values
+		// ------------
+		// values[0] => Temperature
+		// values[1] => Humidity
+		// values[2] => UV
+		// values[3] => Particles
+		let values = new Float32Array(buffer.slice(10, 26));
+
+		// Carbon Monoxide		
+		let carbonMonoxide = new Int16Array(buffer, 26, 1);
+
+		return {
+			deviceID: deviceID,
+			temperature: values[0],
+			humidity: values[1],
+			uv: values[2],
+			particles: values[3],
+			carbonMonoxide: carbonMonoxide,
+		};
+	};
+	sendData(reading) {
+		dispatcher.dispatch({
+			type: 'sensorReading',
+			reading: {
+				deviceID: reading.deviceID,
+				temperature: reading.temperature,
+				humidity: reading.humidity,
+				uv: reading.uv,
+				particles: reading.particles,
+				carbonMonoxide: reading.carbonMonoxide,
+			},
+		});
+	}
 }
 
 class NetworkManager extends React.Component {
@@ -209,7 +295,7 @@ class NetworkManager extends React.Component {
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload) {
 			case 'sendSensorReading':
-				this.sendSensorReading(payload.deviceID, payload.data, payload.coordinate); break;
+				this.initiateSendSensorReading(payload.data); break;
 			}
 		});
 
@@ -233,61 +319,50 @@ class NetworkManager extends React.Component {
 	};
 	onResume = () => {
 	};
-	sendSensorReading = (deviceID, data, coordinate) => {
-		if (!(!!deviceID && !!data && !!coordinate)) {
-			return;
-		}
-
+	initiateSendSensorReading = (data) => {
 		// For real-time viewers
-		this.sendSensorReadingRealtime(deviceID, data, coordinate);
+		//this.sendSensorReadingRealtime(data);
 
-		// Save sensor reading to database
-		let device = Parse.Object.extend('Device');
-		let query = new Parse.Query(device);
-		query.get(deviceID, {
-			success: (device) => {
-				let reading = new ReadingObject();
-				reading.set('data', data);
-				reading.set('coordinate', new Parse.GeoPoint(coordinate));
-				reading.set('device', device);
-				reading.save(null, {
-					success: (reading) => {
-						// do nothing
-					},
-					error: (reading, error) => {
-						toastr.error('Failed to upload sensor readings.', '', { timeOut: 1000 });
-					},
-				});
-			},
-			error: (device, error) => {
-				// do nothing
-			},
-		});
+		// For permanent storage
+		//this.sendSensorReading(data);
 	};
-	sendSensorReadingRealtime(deviceID, data, coordinate) {
+	sendSensorReading(data) {
+		if (!data)
+			return;
+
+		$.ajax({
+			url: 'https://sensenet.bbh-labs.com.sg/reading',
+			method: 'POST',
+			data: data,
+		});
+	}
+	sendSensorReadingRealtime(data) {
+		if (!data)
+			return;
+
 		channel.trigger('client-reading', {
 			deviceID: deviceID,
 			data: data,
-			coordinate: coordinate,
+			coordinates: coordinates,
 		});
 	}
 	postDummyData = () => {
-		let position = {
-			coords: {
-				latitude: 1.25 + Math.random() * 0.15,
-				longitude: 103.65 + Math.random() * 0.3,
-			},
+		let coordinates = {
+			latitude: 1.25 + Math.random() * 0.15,
+			longitude: 103.65 + Math.random() * 0.3,
 		};
 
 		let data = {
+			deviceID: '71GM9xi757',
 			temperature: 28 + Math.random() * 10,
 			humidity: Math.random() * 100,
 			uv: Math.random() * 15,
 			carbonMonoxide: Math.random() * 1024,
 			particles: Math.random() * 1024,
+			coordinates: coordinates,
 		};
 
-		this.sendSensorReading('71GM9xi757', data, position.coords);
+		this.initiateSendSensorReading(data);
 	};
 	initPusher() {
 		pusher = new Pusher('ae0834efadeb12c41af8', {
@@ -319,134 +394,23 @@ class NetworkManager extends React.Component {
 	}
 }
 
-class Authentication extends React.Component {
-	render() {
-		return (
-			<div className='authentication flex column'>
-				<form className='flex column one' action='#'>
-					<div className='flex row align-center justify-center'>
-						<h3>SenseNet</h3>
-					</div>
-					<div className='flex column align-center justify-center'>
-						<div className='flex column one'>
-							<label htmlFor='email'>Email</label>
-							<input ref='email' id='email' type='email' />
-						</div>
-						<div className='flex column one'>
-							<label htmlFor='password'>Password</label>
-							<input ref='password' id='password' type='password' />
-						</div>
-					</div>
-					<div className='flex row align-center justify-center'>
-						<button onClick={this.login}>
-							{ this.state.loggingIn ? 'Logging In..' : 'Log In' }
-						</button>
-						<button onClick={this.signup}>
-							{ this.state.signingUp ? 'Signing Up..' : 'Sign Up' }
-						</button>
-						<button onClick={this.resetPassword}>
-							{ this.state.resettingPassword ? 'Resetting Password..' : 'Reset Password' }
-						</button>
-					</div>
-				</form>
-			</div>
-		)
-	}
-	state = {
-		loggingIn: false,
-		signingUp: false,
-		resettingPassword: false,
-	};
-	componentDidMount() {
-		dispatcher.dispatch({ type: 'reloadCurrentUser' });
-	}
-	login = (event) => {
-		event.preventDefault();
-
-		this.setState({ loggingIn: true });
-
-		Parse.User.logIn(this.refs.email.value, this.refs.password.value, {
-			success: (user) => {
-				dispatcher.dispatch({ type: 'reloadCurrentUser' });
-				this.setState({ loggingIn: false });
-			},
-			error: (user, error) => {
-				dispatcher.dispatch({ type: 'reloadCurrentUser' });
-				this.setState({ loggingIn: false });
-			},
-		});
-	};
-	signup = (event) => {
-		event.preventDefault();
-
-		this.setState({ signingUp: true });
-
-		let user = new Parse.User();
-		user.set('username', this.refs.email.value);
-		user.set('email', this.refs.email.value);
-		user.set('password', this.refs.password.value);
-		user.signUp(null, {
-			success: (user) => {
-				dispatcher.dispatch({ type: 'reloadCurrentUser' });
-				this.setState({ signingUp: false });
-				toastr.success('Successfully registered!');
-			},
-			error: (user, error) => {
-				dispatcher.dispatch({ type: 'reloadCurrentUser' });
-				this.setState({ signingUp: false });
-				toastr.error('Error: ' + error.code + ' ' + error.message);
-			},
-		});
-	};
-	resetPassword = (event) => {
-		event.preventDefault();
-
-		this.setState({ resettingPassword: true });
-
-		Parse.User.requestPasswordReset(this.refs.email.value, {
-			success: () => {
-				this.setState({ resettingPassword: false });
-				toastr.success('Sent reset password link to your email address!');
-			},
-			error: (error) => {
-				this.setState({ resettingPassword: false });
-				toastr.error('Error: ' + error.code + ' ' + error.message);
-			}
-		});
-	};
-}
-
 class Dashboard extends React.Component {
-	state = {
-		page: 'overview',
-		devices: null,
-	};
 	render() {
 		let page = null;
 
 		switch (this.state.page) {
 		case 'overview':
 			page = <Overview />; break;
-		case 'devices':
-			page = <Devices devices={ this.state.devices } />; break;
-		case 'settings':
-			page = <Settings />; break;
+		case 'my-device':
+			page = <MyDevice connected={ this.props.connected } readings={ this.props.readings } />; break;
 		}
 
 		return page;
 	}
+	state = {
+		page: 'my-device',
+	};
 	componentDidMount() {
-		let device = Parse.Object.extend('Device');
-		let query = new Parse.Query(device);
-		query.find({
-			success: (results) => {
-				this.setState({ devices: results });
-			},
-			error: (error) => {
-				toastr.error('Failed to load devices!', '', { timeOut: 1000 });
-			},
-		});
-
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload.type) {
 			case 'goto':
@@ -485,284 +449,49 @@ class Overview extends React.Component {
 	}
 }
 
-class Devices extends React.Component {
-	render() {
-		let devices = this.props.devices;
-		let myDevice = this.props.myDevice;
-		return (
-			<div className='flex one column'>
-			{ !!myDevice ? <MyDevice device={ myDevice } /> : null }
-			{
-				!!devices ? devices.map((device, i) => {
-					return <Device key={ device.id } device={ device } />
-				}) : null
-			}
-			</div>
-		)
-	}
-}
-
 class MyDevice extends React.Component {
 	render() {
-		let device = this.props.myDevice;
-		let readings = this.state.readings;
+		let connected = this.props.connected;
 		return (
 			<div className='flex one column sensenode z-depth-2'>
-				<h5>My SenseNode</h5>
-				<div className='ct-chart ct-golden-section' id='my-device'>
-				</div>
-			</div>
-		)
-	}
-	state = {
-		readings: [ null,null,null,null,null,null,null,null,null,null ],
-	};
-	componentDidMount() {
-		let device = this.props.device;
-
-		this.listenerID = dispatcher.register((payload) => {
-			switch (payload.type) {
-			case 'sendSensorReading':
-				this.addReading(payload);
-				break;
-			}
-		});
-
-		// Setup Chartist line graph
-		new Chartist.Line('#my-device', {
-			labels: this.readingLabels(),
-			series: this.readingSeries(),
-		}, {
-			lineSmooth: Chartist.Interpolation.cardinal({
-				fillHoles: true,
-			}),
-		});
-	}
-	addReading = (reading) => {
-		// Put new reading into the stack
-		let readings = this.state.readings;
-		readings.push(reading);
-		readings.shift();
-		this.setState({ readings: readings });
-
-		// Update Chartist line graph
-		new Chartist.Line('#my-device', {
-			labels: this.readingLabels(),
-			series: this.readingSeries(),
-		}, {
-			fullWidth: true,
-			lineSmooth: Chartist.Interpolation.cardinal({
-				fillHoles: true,
-			}),
-		});
-	};
-	readingLabels = () => {
-		return this.state.readings.map(function(r, i) {
-			return i;
-		});
-	};
-	readingSeries = () => {
-		let readings = this.state.readings;
-		let series = [];
-		let isValid = function(r, property) {
-			return !!r && typeof(r) == 'object' &&
-					 r.hasOwnProperty('data') &&
-					 r.data.hasOwnProperty(property);
-		};
-
-		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.temperature : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.humidity : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.carbonMonoxide * 0.1 : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.uv * 0.1 : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r) ? r.data.particles * 0.1 : 0;
-		}));
-
-		return series;
-	};
-}
-
-class Device extends React.Component {
-	render() {
-		let device = this.props.device;
-		let readings = this.state.readings;
-		return (
-			<div className='flex one column sensenode z-depth-2'>
-				<h5>SenseNode</h5>
-				<div className='ct-chart ct-golden-section' id={ this.readingID() }>
-				</div>
-			</div>
-		)
-	}
-	state = {
-		readings: [ null,null,null,null,null,null,null,null,null,null ]
-	};
-	componentDidMount() {
-		let device = this.props.device;
-
-		this.listenerID = dispatcher.register((payload) => {
-			switch (payload.type) {
-			case 'reading':
-				if (device.id == payload.reading.deviceID) {
-					this.addReading(payload.reading);
+				<h5>My Device</h5>
+				<canvas ref='canvas' />
+				{
+					connected ?
+					<button onClick={this.disconnectDevice}>Disconnect Device</button> :
+					<button onClick={this.connectDevice}>Connect Device</button>
 				}
-				break;
-			}
-		});
-
-		// Setup Chartist line graph
-		new Chartist.Line('#' + this.readingID(), {
-			labels: this.readingLabels(),
-			series: this.readingSeries(),
-		}, {
-			fullWidth: true,
-			lineSmooth: Chartist.Interpolation.cardinal({
-				fillHoles: true,
-			}),
-		});
-	}
-	addReading = (reading) => {
-		// Put new reading into the stack
-		let readings = this.state.readings;
-		readings.push(reading);
-		readings.shift();
-		this.setState({ readings: readings });
-
-		// Update Chartist line graph
-		new Chartist.Line('#' + this.readingID(), {
-			labels: this.readingLabels(),
-			series: this.readingSeries(),
-		}, {
-			fullWidth: true,
-			lineSmooth: Chartist.Interpolation.cardinal({
-				fillHoles: true,
-			}),
-		});
-	};
-	readingID = () => {
-		return 'reading-' + this.props.device.id;
-	};
-	readingLabels = () => {
-		return this.state.readings.map(function(r, i) {
-			return i;
-		});
-	};
-	readingSeries = () => {
-		let readings = this.state.readings;
-		let series = [];
-		let isValid = function(r, property) {
-			return !!r && typeof(r) == 'object' &&
-					 r.hasOwnProperty('data') &&
-					 r.data.hasOwnProperty(property);
-		};
-
-		series.push(readings.map(function(r) {
-			return isValid(r, 'temperature') ? r.data.temperature : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r, 'humidity') ? r.data.humidity : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r, 'carbonMonoxide') ? r.data.carbonMonoxide * 0.1 : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r, 'uv') ? r.data.uv * 0.1 : 0;
-		}));
-		series.push(readings.map(function(r) {
-			return isValid(r, 'particles') ? r.data.particles * 0.1 : 0;
-		}));
-
-		return series;
-	};
-}
-
-class Settings extends React.Component {
-	render() {
-		return (
-			<div className='settings flex column align-center'>
-				<form className='change-email flex column one' action='#'>
-					<div className='flex row align-center justify-center'>
-						<h3>Change Email</h3>
-					</div>
-					<div className='flex column'>
-						<div className='flex column'>
-							<label htmlFor='old-email'>Old Email</label>
-							<input ref='oldEmail' id='old-email' type='email' className='validate' />
-						</div>
-						<div className='flex column'>
-							<label htmlFor='new-email'>New Email</label>
-							<input ref='newEmail' id='new-email' type='email' className='validate' />
-						</div>
-						<div className='flex column'>
-							<label htmlFor='password'>Password</label>
-							<input ref='password' id='password' type='password' className='validate' />
-						</div>
-						<button onClick={this.changeEmail}>
-							{ this.state.changingEmail ? 'Submitting..' : 'Submit' }
-						</button>
-					</div>
-				</form>
-				<form className='change-password flex column one' action='#'>
-					<div className='flex row align-center justify-center'>
-						<h3>Change Password</h3>
-					</div>
-					<div className='flex column'>
-						<div className='flex column'>
-							<label htmlFor='email'>Email</label>
-							<input ref='email' id='email' type='email' className='validate' />
-						</div>
-						<div className='flex column'>
-							<label htmlFor='old-password'>Old Password</label>
-							<input ref='oldPassword' id='old-password' type='password' className='validate' />
-						</div>
-						<div className='flex column'>
-							<label htmlFor='new-password'>New Password</label>
-							<input ref='newPassword' id='new-password' type='password' className='validate' />
-						</div>
-						<div className='flex column'>
-							<label htmlFor='confirm-new-password'>Confirm New Password</label>
-							<input ref='confirmNewPassword' id='confirm-new-password' type='password' className='validate' />
-						</div>
-						<button onClick={this.changePassword}>
-							{ this.state.changingPassword ? 'Submitting..' : 'Submit' }
-						</button>
-					</div>
-				</form>
 			</div>
 		)
 	}
-	state = {
-		changingPassword: false,
-		changingEmail: false,
-	};
-	changePassword = (event) => {
-		event.preventDefault();
+	componentDidMount() {
+		this.updateCanvas();
+	}
+	componentDidUpdate() {
+		this.updateCanvas();
+	}
+	connectDevice() {
+		dispatcher.dispatch({ type: 'connectDevice' });
+	}
+	disconnectDevice() {
+		dispatcher.dispatch({ type: 'disconnectDevice' });
+	}
+	updateCanvas = () => {
+		let canvas = this.refs.canvas;
+		let context = canvas.getContext('2d');
+		let width = canvas.width = canvas.offsetWidth;
+		let height = canvas.height = canvas.offsetHeight;
 
-		let newPassword = this.refs.newPassword.value;
-		let confirmNewPassword = this.refs.confirmNewPassword.value;
-		if (newPassword !== confirmNewPassword) {
-			toastr.error('New password doesn\'t match confirmation password', '', { timeOut: 3000 });
-			return;
+		context.fillStyle = 'black';
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		let readings = this.props.readings;
+		let cellWidth = width / readings.length;
+		let cellHeight = height / readings.length;
+
+		for (let i in readings) {
+			let cellX = cellWidth * i;
 		}
-
-		// this.setState({ changingPassword: true });
-
-		// TODO: Implement Parse's Change Password
-	};
-	changeEmail = (event) => {
-		event.preventDefault();
-
-		// this.setState({ changingEmail: true });
-
-		// TODO: Implement Parse's Change Email
 	};
 }
 
@@ -772,18 +501,11 @@ class Navbar extends React.Component {
 			<nav className='navbar'>
 				<ul className='navbar-menu flex row'>
 					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'overview')}>Overview</a></li>
-					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'devices')}>Devices</a></li>
-					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'settings')}>Settings</a></li>
-					<li className='flex navbar-menu-item'><a href='#' onClick={this.logout}>Log Out</a></li>
+					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'my-device')}>My Device</a></li>
 				</ul>
 			</nav>
 		)
 	}
-	logout = (event) => {
-		Parse.User.logOut().then(() => {
-			dispatcher.dispatch({ type: 'reloadCurrentUser' });
-		});
-	};
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

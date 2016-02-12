@@ -8,6 +8,10 @@ a {
 	text-decoration: none;
 }
 
+ul {
+	padding: 0;
+}
+
 .navbar {
 	background: #E82C0C;
 	color: white;
