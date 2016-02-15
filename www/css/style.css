@@ -1,59 +1,68 @@
 html, body, #root {
 	height: 100%;
 	margin: 0;
+	color: white;
 	font-family: 'Open Sans', 'Helvetica', 'Arial', 'sans-serif';
 }
 
-a {
-	text-decoration: none;
+.my-device {
+	background: linear-gradient(#23223C, #9E5C6C);
 }
 
-ul {
-	padding: 0;
-}
-
-.navbar {
-	background: #E82C0C;
-	color: white;
-}
-
-.navbar-menu-item a {
-	color: white;
-	margin-left: 16px;
-}
-
-.authentication,
-.settings {
-	width: 80%;
+.sensenet-logo,
+.device-image {
+	max-width: 50%;
 	margin: 0 auto;
 }
 
-.authentication label {
+.connect-button,
+.disconnect-button {
+	max-width: 50%;
+	background: white;
+	padding: 8px 64px;
+	border: none;
+	border-radius: 16px;
+}
+
+.line {
+	border: 1px solid white;
+	height: 1px;
+}
+
+.location-title {
 	margin: 0 16px;
 }
 
-.authentication input,
-.authentication button {
-	margin: 16px;
-	margin: 1rem;
-	padding: 16px;
-	padding: 1rem;
+.air-quality-container {
+	width: 33vmin;
+	height: 33vmin;
+	background: #33aedc;
+	border-radius: 50%;
 }
 
-.settings input,
-.settings button {
-	margin: 16px 0;
-	margin: 1rem 0;
-	padding: 16px;
-	padding: 1rem;
+.air-quality-status,
+.air-quality-score,
+.air-quality-label {
+	margin: 8px 0;
 }
 
-.change-email,
-.change-password {
-	width: 100%;
+.sensor {
+	margin: 8px 0;
 }
 
-.sensenode {
-	padding: 16px;
-	padding: 1rem;
+.sensor-bar {
+	height: 32px;
+	width: 50%;
 }
+
+.sensor-bar,
+.sensor-value,
+.sensor-label {
+	margin: 0 8px;
+}
+
+.very-high { background: #25243C; }
+.high { background: #F05361; }
+.medium { background: #FD6D4C; }
+.low { background: #3CD1AF; }
+.very-low { background: #33AEDC; }

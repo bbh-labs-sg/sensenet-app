@@ -10,6 +10,10 @@ var _reactDom = require('react-dom');
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
 var _flux = require('flux');
 
 var _flux2 = _interopRequireDefault(_flux);
@@ -26,7 +30,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // React
 
+
+// Classnames
+
+
 // Flux
+
 
 var dispatcher = new _flux2.default.Dispatcher();
 
@@ -34,9 +43,6 @@ var dispatcher = new _flux2.default.Dispatcher();
 
 var pusher = null,
     channel = null;
-
-// Mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 
 // Sensor data buffer
 var sensorDataBuffer = undefined;
@@ -65,6 +71,10 @@ function norm(value, min, max) {
 	return (value - min) / (max - min);
 }
 
+function map(value, min1, max1, min2, max2) {
+	return (value - min1) / (max1 - min1) * (max2 - min2) - min2;
+}
+
 function indexOf(array, value) {
 	var start = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
 
@@ -91,7 +101,7 @@ var App = function (_React$Component) {
 		}
 
 		return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(App)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.state = {
-			readings: [null, null, null, null, null, null, null, null, null, null],
+			reading: null,
 			deviceID: null,
 			deviceState: STATE_NOT_CONNECTED
 		}, _this.onPause = function () {
@@ -106,11 +116,11 @@ var App = function (_React$Component) {
 	_createClass(App, [{
 		key: 'render',
 		value: function render() {
+			var connected = this.state.deviceState == STATE_CONNECTED;
 			return _react2.default.createElement(
 				'div',
 				{ id: 'app', className: 'flex column one' },
-				_react2.default.createElement(Navbar, null),
-				_react2.default.createElement(Dashboard, { readings: this.state.readings, connected: this.state.deviceState == STATE_CONNECTED }),
+				_react2.default.createElement(Dashboard, { reading: this.state.reading, connected: connected }),
 				_react2.default.createElement(DeviceManager, { ref: 'deviceManager', deviceID: this.state.deviceID, deviceState: this.state.deviceState }),
 				_react2.default.createElement(NetworkManager, { ref: 'networkManager' })
 			);
@@ -126,10 +136,7 @@ var App = function (_React$Component) {
 						_this2.reloadCurrentUser();
 						break;
 					case 'sensorReading':
-						var readings = _this2.state.readings;
-						readings.push(payload.reading);
-						readings.shift();
-						_this2.setState({ readings: readings });
+						_this2.setState({ reading: payload.reading });
 						break;
 					case 'deviceID':
 						_this2.setState({ deviceID: payload.deviceID });
@@ -185,6 +192,7 @@ var DeviceManager = function (_React$Component2) {
 		}, _this3.onBluetoothDisabled = function () {
 			toastr.error('Bluetooth is not enabled', 'Please go to your phone settings and enable Bluetooth.', { timeOut: 3000 });
 		}, _this3.onBluetoothDisconnectSucceeded = function () {
+			toastr.success('Successfully disconnected from the device', '', { timeOut: 1000 });
 			dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_NOT_CONNECTED });
 		}, _this3.onBluetoothDisconnectFailed = function () {
 			toastr.error('Failed to disconnect the device', '', { timeOut: 3000 });
@@ -286,7 +294,7 @@ var DeviceManager = function (_React$Component2) {
 				humidity: values[1],
 				uv: values[2],
 				particles: values[3],
-				carbonMonoxide: carbonMonoxide
+				carbonMonoxide: carbonMonoxide[0]
 			};
 		}, _temp2), _possibleConstructorReturn(_this3, _ret2);
 	}
@@ -502,10 +510,8 @@ var Dashboard = function (_React$Component4) {
 			var page = null;
 
 			switch (this.state.page) {
-				case 'overview':
-					page = _react2.default.createElement(Overview, null);break;
 				case 'my-device':
-					page = _react2.default.createElement(MyDevice, { connected: this.props.connected, readings: this.props.readings });break;
+					page = _react2.default.createElement(MyDevice, { connected: this.props.connected, reading: this.props.reading });break;
 			}
 
 			return page;
@@ -532,79 +538,13 @@ var Dashboard = function (_React$Component4) {
 	return Dashboard;
 }(_react2.default.Component);
 
-var Overview = function (_React$Component5) {
-	_inherits(Overview, _React$Component5);
-
-	function Overview() {
-		_classCallCheck(this, Overview);
-
-		return _possibleConstructorReturn(this, Object.getPrototypeOf(Overview).apply(this, arguments));
-	}
-
-	_createClass(Overview, [{
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement('div', { id: 'map', className: 'flex column one' });
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			this.drawMap();
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			window.map.remove();
-			window.map = null;
-		}
-	}, {
-		key: 'drawMap',
-		value: function drawMap(geojson) {
-			var map = new mapboxgl.Map({
-				container: 'map',
-				style: 'mapbox://styles/jackyb/cijmshu7s00mdbolxqpd5f5pz',
-				center: [103.83888, 1.29094],
-				zoom: 13
-			});
-
-			window.map = map;
-		}
-	}]);
-
-	return Overview;
-}(_react2.default.Component);
-
-var MyDevice = function (_React$Component6) {
-	_inherits(MyDevice, _React$Component6);
+var MyDevice = function (_React$Component5) {
+	_inherits(MyDevice, _React$Component5);
 
 	function MyDevice() {
-		var _Object$getPrototypeO5;
-
-		var _temp5, _this10, _ret5;
-
 		_classCallCheck(this, MyDevice);
 
-		for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-			args[_key5] = arguments[_key5];
-		}
-
-		return _ret5 = (_temp5 = (_this10 = _possibleConstructorReturn(this, (_Object$getPrototypeO5 = Object.getPrototypeOf(MyDevice)).call.apply(_Object$getPrototypeO5, [this].concat(args))), _this10), _this10.updateCanvas = function () {
-			var canvas = _this10.refs.canvas;
-			var context = canvas.getContext('2d');
-			var width = canvas.width = canvas.offsetWidth;
-			var height = canvas.height = canvas.offsetHeight;
-
-			context.fillStyle = 'black';
-			context.fillRect(0, 0, canvas.width, canvas.height);
-
-			var readings = _this10.props.readings;
-			var cellWidth = width / readings.length;
-			var cellHeight = height / readings.length;
-
-			for (var i in readings) {
-				var cellX = cellWidth * i;
-			}
-		}, _temp5), _possibleConstructorReturn(_this10, _ret5);
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(MyDevice).apply(this, arguments));
 	}
 
 	_createClass(MyDevice, [{
@@ -613,33 +553,9 @@ var MyDevice = function (_React$Component6) {
 			var connected = this.props.connected;
 			return _react2.default.createElement(
 				'div',
-				{ className: 'flex one column sensenode z-depth-2' },
-				_react2.default.createElement(
-					'h5',
-					null,
-					'My Device'
-				),
-				_react2.default.createElement('canvas', { ref: 'canvas' }),
-				connected ? _react2.default.createElement(
-					'button',
-					{ onClick: this.disconnectDevice },
-					'Disconnect Device'
-				) : _react2.default.createElement(
-					'button',
-					{ onClick: this.connectDevice },
-					'Connect Device'
-				)
+				{ className: 'my-device flex one column' },
+				connected ? _react2.default.createElement(Connected, { reading: this.props.reading }) : _react2.default.createElement(Disconnected, null)
 			);
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			this.updateCanvas();
-		}
-	}, {
-		key: 'componentDidUpdate',
-		value: function componentDidUpdate() {
-			this.updateCanvas();
 		}
 	}, {
 		key: 'connectDevice',
@@ -656,48 +572,254 @@ var MyDevice = function (_React$Component6) {
 	return MyDevice;
 }(_react2.default.Component);
 
-var Navbar = function (_React$Component7) {
-	_inherits(Navbar, _React$Component7);
+var Connected = function (_React$Component6) {
+	_inherits(Connected, _React$Component6);
 
-	function Navbar() {
-		_classCallCheck(this, Navbar);
+	function Connected() {
+		_classCallCheck(this, Connected);
 
-		return _possibleConstructorReturn(this, Object.getPrototypeOf(Navbar).apply(this, arguments));
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(Connected).apply(this, arguments));
 	}
 
-	_createClass(Navbar, [{
+	_createClass(Connected, [{
 		key: 'render',
 		value: function render() {
-			return _react2.default.createElement(
-				'nav',
-				{ className: 'navbar' },
-				_react2.default.createElement(
-					'ul',
-					{ className: 'navbar-menu flex row' },
+			var reading = this.props.reading;
+			if (reading) {
+				/* FOR DEBUGGING PURPOSES
+    reading = {
+    	temperature: 26.6,
+    	humidity: 49,
+    	uv: 11.57,
+    	particles: 0.62,
+    	carbonMonoxide: 87,
+    };
+    */
+				var temperaturePct = map(reading.temperature, 25, 34, 0, 100);
+				var humidityPct = reading.humidity;
+				var carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
+				var uvPct = map(reading.uv, 0, 15, 0, 100);
+				var particlesPct = map(reading.particles, 0, 2000, 0, 100);
+				var quality = ((temperaturePct + humidityPct + carbonMonoxidePct + uvPct + particlesPct) * 0.2).toFixed();
+				return _react2.default.createElement(
+					'div',
+					{ className: 'flex column one' },
 					_react2.default.createElement(
-						'li',
-						{ className: 'flex navbar-menu-item' },
+						'div',
+						{ className: 'flex column one' },
 						_react2.default.createElement(
-							'a',
-							{ href: '#', onClick: goto.bind(null, 'overview') },
-							'Overview'
+							'div',
+							{ className: 'flex row one align-center justify-center' },
+							_react2.default.createElement('hr', { className: 'line flex one' }),
+							_react2.default.createElement(
+								'p',
+								{ className: 'location-title' },
+								'LOCATION'
+							),
+							_react2.default.createElement('hr', { className: 'line flex one' })
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'flex row one align-center justify-center' },
+							_react2.default.createElement(
+								'h3',
+								{ className: 'location' },
+								'5 MAGAZINE ROAD'
+							)
 						)
 					),
 					_react2.default.createElement(
-						'li',
-						{ className: 'flex navbar-menu-item' },
+						'div',
+						{ className: 'flex column two align-center justify-center' },
 						_react2.default.createElement(
-							'a',
-							{ href: '#', onClick: goto.bind(null, 'my-device') },
-							'My Device'
+							'div',
+							{ className: (0, _classnames2.default)('air-quality-container flex column align-center justify-center', this.qualityColor(quality)) },
+							_react2.default.createElement(
+								'h3',
+								{ className: 'air-quality-status' },
+								this.airQualityStatus(quality)
+							),
+							_react2.default.createElement(
+								'h1',
+								{ className: 'air-quality-score' },
+								quality
+							)
+						),
+						_react2.default.createElement(
+							'h3',
+							{ className: 'air-quality-label' },
+							'AIR QUALITY'
 						)
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'sensors flex column three justify-center' },
+						_react2.default.createElement(Sensor, { label: 'Temperature', percentage: temperaturePct, value: reading.temperature }),
+						_react2.default.createElement(Sensor, { label: 'Humidity', percentage: humidityPct, value: reading.humidity }),
+						_react2.default.createElement(Sensor, { label: 'Carbon Monoxide', percentage: carbonMonoxidePct, value: reading.carbonMonoxide }),
+						_react2.default.createElement(Sensor, { label: 'UV', percentage: uvPct, value: reading.uv }),
+						_react2.default.createElement(Sensor, { label: 'Particles', percentage: particlesPct, value: reading.particles })
+					),
+					_react2.default.createElement(
+						'div',
+						{ className: 'flex one align-center justify-center' },
+						_react2.default.createElement(
+							'button',
+							{ className: 'disconnect-button', onClick: this.disconnect },
+							'DISCONNECT'
+						)
+					)
+				);
+			}
+			return null;
+		}
+	}, {
+		key: 'airQualityStatus',
+		value: function airQualityStatus(quality) {
+			if (quality < 20) {
+				return 'VERY CLEAN';
+			} else if (quality < 40) {
+				return 'CLEAN';
+			} else if (quality < 60) {
+				return 'POLLUTED';
+			} else if (quality < 80) {
+				return 'HAZARDOUS';
+			} else {
+				return 'VERY HAZARDOUS';
+			}
+		}
+	}, {
+		key: 'qualityColor',
+		value: function qualityColor(quality) {
+			if (quality < 20) {
+				return 'very-low';
+			} else if (quality < 40) {
+				return 'low';
+			} else if (quality < 60) {
+				return 'medium';
+			} else if (quality < 80) {
+				return 'high';
+			} else {
+				return 'very-high';
+			}
+		}
+	}, {
+		key: 'disconnect',
+		value: function disconnect() {
+			dispatcher.dispatch({ type: 'disconnectDevice' });
+		}
+	}]);
+
+	return Connected;
+}(_react2.default.Component);
+
+var Sensor = function (_React$Component7) {
+	_inherits(Sensor, _React$Component7);
+
+	function Sensor() {
+		var _Object$getPrototypeO5;
+
+		var _temp5, _this11, _ret5;
+
+		_classCallCheck(this, Sensor);
+
+		for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+			args[_key5] = arguments[_key5];
+		}
+
+		return _ret5 = (_temp5 = (_this11 = _possibleConstructorReturn(this, (_Object$getPrototypeO5 = Object.getPrototypeOf(Sensor)).call.apply(_Object$getPrototypeO5, [this].concat(args))), _this11), _this11.barLabel = function () {
+			var percentage = _this11.props.percentage;
+			if (percentage < 20) {
+				return 'very-low';
+			} else if (percentage < 40) {
+				return 'low';
+			} else if (percentage < 60) {
+				return 'medium';
+			} else if (percentage < 80) {
+				return 'high';
+			} else {
+				return 'very-high';
+			}
+		}, _temp5), _possibleConstructorReturn(_this11, _ret5);
+	}
+
+	_createClass(Sensor, [{
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'sensor flex row' },
+				_react2.default.createElement(
+					'h3',
+					{ className: 'sensor-label flex' },
+					this.props.label
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'flex one' },
+					_react2.default.createElement('span', { className: (0, _classnames2.default)('sensor-bar', this.barLabel()), style: { width: this.props.percentage + '%' } }),
+					_react2.default.createElement(
+						'span',
+						{ className: 'sensor-value flex' },
+						this.props.value.toFixed(1)
 					)
 				)
 			);
 		}
 	}]);
 
-	return Navbar;
+	return Sensor;
+}(_react2.default.Component);
+
+var Disconnected = function (_React$Component8) {
+	_inherits(Disconnected, _React$Component8);
+
+	function Disconnected() {
+		_classCallCheck(this, Disconnected);
+
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(Disconnected).apply(this, arguments));
+	}
+
+	_createClass(Disconnected, [{
+		key: 'render',
+		value: function render() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'disconnected flex column one' },
+				_react2.default.createElement(
+					'div',
+					{ className: 'flex column one align-center justify-center' },
+					_react2.default.createElement('img', { className: 'sensenet-logo', src: 'images/sensenet.png' })
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'flex column one align-center justify-center' },
+					_react2.default.createElement('img', { className: 'device-image', src: 'images/device.png' }),
+					_react2.default.createElement(
+						'p',
+						null,
+						'Device'
+					)
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'flex column one align-center justify-center' },
+					_react2.default.createElement(
+						'button',
+						{ className: 'connect-button', onClick: this.connect },
+						'CONNECT'
+					)
+				)
+			);
+		}
+	}, {
+		key: 'connect',
+		value: function connect() {
+			dispatcher.dispatch({ type: 'connectDevice' });
+		}
+	}]);
+
+	return Disconnected;
 }(_react2.default.Component);
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('root'));

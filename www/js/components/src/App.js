@@ -2,6 +2,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+// Classnames
+import cx from 'classnames'
+
 // Flux
 import Flux from 'flux'
 let dispatcher = new Flux.Dispatcher();
@@ -10,9 +13,6 @@ let dispatcher = new Flux.Dispatcher();
 import Pusher from 'pusher-js'
 let pusher = null,
     channel = null;
-
-// Mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3liIiwiYSI6ImI0NDE5NjdmMWYzMjM5YzQyMzUxNzkyOGUwMzgzZmNjIn0.7-uee1Olm9EI4cT04c6gQw';
 
 // Sensor data buffer
 let sensorDataBuffer;
@@ -41,6 +41,10 @@ function norm(value, min, max) {
 	return (value - min) / (max - min);
 }
 
+function map(value, min1, max1, min2, max2) {
+	return (value - min1) / (max1 - min1) * (max2 - min2) - min2;
+}
+
 function indexOf(array, value, start = 0) {
 	for (let i = start; i < array.length; i++) {
 		if (array[i] === value) {
@@ -52,17 +56,17 @@ function indexOf(array, value, start = 0) {
 
 class App extends React.Component {
 	render() {
+		let connected = this.state.deviceState == STATE_CONNECTED;
 		return (
 			<div id='app' className='flex column one'>
-				<Navbar />
-				<Dashboard readings={ this.state.readings } connected={ this.state.deviceState == STATE_CONNECTED } />
+				<Dashboard reading={ this.state.reading } connected={ connected } />
 				<DeviceManager ref='deviceManager' deviceID={ this.state.deviceID } deviceState={ this.state.deviceState } />
 				<NetworkManager ref='networkManager' />
 			</div>
 		)
 	}
 	state = {
-		readings: [ null, null, null, null, null, null, null, null, null, null ],
+		reading: null,
 		deviceID: null,
 		deviceState: STATE_NOT_CONNECTED,
 	};
@@ -73,10 +77,7 @@ class App extends React.Component {
 				this.reloadCurrentUser();
 				break;
 			case 'sensorReading':
-				let readings = this.state.readings;
-				readings.push(payload.reading);
-				readings.shift();
-				this.setState({ readings: readings });
+				this.setState({ reading: payload.reading });
 				break;
 			case 'deviceID':
 				this.setState({ deviceID: payload.deviceID });
@@ -158,6 +159,7 @@ class DeviceManager extends React.Component {
 		);
 	};
 	onBluetoothDisconnectSucceeded = () => {
+		toastr.success('Successfully disconnected from the device', '', { timeOut: 1000 });
 		dispatcher.dispatch({ type: 'deviceState', deviceState: STATE_NOT_CONNECTED });
 	};
 	onBluetoothDisconnectFailed = () => {
@@ -269,7 +271,7 @@ class DeviceManager extends React.Component {
 			humidity: values[1],
 			uv: values[2],
 			particles: values[3],
-			carbonMonoxide: carbonMonoxide,
+			carbonMonoxide: carbonMonoxide[0],
 		};
 	};
 	sendData(reading) {
@@ -399,10 +401,8 @@ class Dashboard extends React.Component {
 		let page = null;
 
 		switch (this.state.page) {
-		case 'overview':
-			page = <Overview />; break;
 		case 'my-device':
-			page = <MyDevice connected={ this.props.connected } readings={ this.props.readings } />; break;
+			page = <MyDevice connected={ this.props.connected } reading={ this.props.reading } />; break;
 		}
 
 		return page;
@@ -423,52 +423,14 @@ class Dashboard extends React.Component {
 	}
 }
 
-class Overview extends React.Component {
-	render() {
-		return (
-			<div id='map' className='flex column one'>
-			</div>
-		)
-	}
-	componentDidMount() {
-		this.drawMap();
-	}
-	componentWillUnmount() {
-		window.map.remove();
-		window.map = null;
-	}
-	drawMap(geojson) {
-		let map = new mapboxgl.Map({
-			container: 'map',
-			style: 'mapbox://styles/jackyb/cijmshu7s00mdbolxqpd5f5pz',
-			center: [ 103.83888, 1.29094 ],
-			zoom: 13,
-		});
-
-		window.map = map;
-	}
-}
-
 class MyDevice extends React.Component {
 	render() {
 		let connected = this.props.connected;
 		return (
-			<div className='flex one column sensenode z-depth-2'>
-				<h5>My Device</h5>
-				<canvas ref='canvas' />
-				{
-					connected ?
-					<button onClick={this.disconnectDevice}>Disconnect Device</button> :
-					<button onClick={this.connectDevice}>Connect Device</button>
-				}
+			<div className='my-device flex one column'>
+				{ connected ? <Connected reading={ this.props.reading } /> : <Disconnected /> }
 			</div>
 		)
-	}
-	componentDidMount() {
-		this.updateCanvas();
-	}
-	componentDidUpdate() {
-		this.updateCanvas();
 	}
 	connectDevice() {
 		dispatcher.dispatch({ type: 'connectDevice' });
@@ -476,35 +438,137 @@ class MyDevice extends React.Component {
 	disconnectDevice() {
 		dispatcher.dispatch({ type: 'disconnectDevice' });
 	}
-	updateCanvas = () => {
-		let canvas = this.refs.canvas;
-		let context = canvas.getContext('2d');
-		let width = canvas.width = canvas.offsetWidth;
-		let height = canvas.height = canvas.offsetHeight;
+}
 
-		context.fillStyle = 'black';
-		context.fillRect(0, 0, canvas.width, canvas.height);
+class Connected extends React.Component {
+	render() {
+		let reading = this.props.reading;
+		if (reading) {
+			/* FOR DEBUGGING PURPOSES
+			reading = {
+				temperature: 26.6,
+				humidity: 49,
+				uv: 11.57,
+				particles: 0.62,
+				carbonMonoxide: 87,
+			};
+			*/
+			let temperaturePct = map(reading.temperature, 25, 34, 0, 100);
+			let humidityPct = reading.humidity;
+			let carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
+			let uvPct = map(reading.uv, 0, 15, 0, 100);
+			let particlesPct = map(reading.particles, 0, 2000, 0, 100);
+			let quality = ((temperaturePct + humidityPct + carbonMonoxidePct + uvPct + particlesPct) * 0.2).toFixed();
+			return (
+				<div className='flex column one'>
+					<div className='flex column one'>
+						<div className='flex row one align-center justify-center'>
+							<hr className='line flex one' /><p className='location-title'>LOCATION</p><hr className='line flex one' />
+						</div>
+						<div className='flex row one align-center justify-center'>
+							<h3 className='location'>5 MAGAZINE ROAD</h3>
+						</div>
+					</div>
+					<div className='flex column two align-center justify-center'>
+						<div className={cx('air-quality-container flex column align-center justify-center', this.qualityColor(quality))}>
+							<h3 className='air-quality-status'>{ this.airQualityStatus(quality) }</h3>
+							<h1 className='air-quality-score'>{ quality }</h1>
+						</div>
+						<h3 className='air-quality-label'>AIR QUALITY</h3>
+					</div>
+					<div className='sensors flex column three justify-center'>
+						<Sensor label='Temperature' percentage={temperaturePct} value={reading.temperature} />
+						<Sensor label='Humidity' percentage={humidityPct} value={reading.humidity} />
+						<Sensor label='Carbon Monoxide' percentage={carbonMonoxidePct} value={reading.carbonMonoxide} />
+						<Sensor label='UV' percentage={uvPct} value={reading.uv} />
+						<Sensor label='Particles' percentage={particlesPct} value={reading.particles} />
+					</div>
+					<div className='flex one align-center justify-center'>
+						<button className='disconnect-button' onClick={this.disconnect}>DISCONNECT</button>
+					</div>
+				</div>
+			)
+		}
+		return null;
+	}
+	airQualityStatus(quality) {
+		if (quality < 20) {
+			return 'VERY CLEAN';
+		} else if (quality < 40) {
+			return 'CLEAN';
+		} else if (quality < 60) {
+			return 'POLLUTED';
+		} else if (quality < 80) {
+			return 'HAZARDOUS';
+		} else {
+			return 'VERY HAZARDOUS';
+		}
+	}
+	qualityColor(quality) {
+		if (quality < 20) {
+			return 'very-low';
+		} else if (quality < 40) {
+			return 'low';
+		} else if (quality < 60) {
+			return 'medium';
+		} else if (quality < 80) {
+			return 'high';
+		} else {
+			return 'very-high';
+		}
+	}
+	disconnect() {
+		dispatcher.dispatch({ type: 'disconnectDevice' });
+	}
+}
 
-		let readings = this.props.readings;
-		let cellWidth = width / readings.length;
-		let cellHeight = height / readings.length;
-
-		for (let i in readings) {
-			let cellX = cellWidth * i;
+class Sensor extends React.Component {
+	render() {
+		return (
+			<div className='sensor flex row'>
+				<h3 className='sensor-label flex'>{ this.props.label }</h3>
+				<div className='flex one'>
+					<span className={cx('sensor-bar', this.barLabel())} style={{ width: this.props.percentage + '%' }} />
+					<span className='sensor-value flex'>{ this.props.value.toFixed(1) }</span>
+				</div>
+			</div>
+		)
+	}
+	barLabel = () => {
+		let percentage = this.props.percentage;
+		if (percentage < 20) {
+			return 'very-low';
+		} else if (percentage < 40) {
+			return 'low';
+		} else if (percentage < 60) {
+			return 'medium';
+		} else if (percentage < 80) {
+			return 'high';
+		} else {
+			return 'very-high';
 		}
 	};
 }
 
-class Navbar extends React.Component {
+class Disconnected extends React.Component {
 	render() {
 		return (
-			<nav className='navbar'>
-				<ul className='navbar-menu flex row'>
-					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'overview')}>Overview</a></li>
-					<li className='flex navbar-menu-item'><a href='#' onClick={goto.bind(null, 'my-device')}>My Device</a></li>
-				</ul>
-			</nav>
+			<div className='disconnected flex column one'>
+				<div className='flex column one align-center justify-center'>
+					<img className='sensenet-logo' src='images/sensenet.png' />
+				</div>
+				<div className='flex column one align-center justify-center'>
+					<img className='device-image' src='images/device.png' />
+					<p>Device</p>
+				</div>
+				<div className='flex column one align-center justify-center'>
+					<button className='connect-button' onClick={this.connect}>CONNECT</button>
+				</div>
+			</div>
 		)
+	}
+	connect() {
+		dispatcher.dispatch({ type: 'connectDevice' });
 	}
 }
 
