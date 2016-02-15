@@ -114,6 +114,16 @@ class DeviceManager extends React.Component {
 				this.disconnectDevice(); break;
 			}
 		});
+
+		navigator.geolocation.watchPosition(
+			this.onGetCurrentPositionSucceeded,
+			this.onGetCurrentPositionError,
+			{
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0,
+			}
+		);
 	}
 	componentWillUnmount() {
 		dispatcher.unregister(this.listenerID);
@@ -243,9 +253,14 @@ class DeviceManager extends React.Component {
 		toastr.error('Bluetooth', 'Failed to get data from the device.', { timeOut: 3000 });
 	};
 	onGetCurrentPositionSucceeded = (position) => {
-		this.data.deviceID = this.props.deviceID;
-		this.data.coordinates = position.coords;
-		this.initiateSendSensorReading(this.data);
+		//this.data.deviceID = this.props.deviceID;
+		//this.data.coordinates = position.coords;
+		//this.initiateSendSensorReading(this.data);
+		dispatcher.dispatch({
+			type: 'GPSPosition',
+			latitude: position.coords.latitude,
+			longitude: position.coords.longitude,
+		});
 	};
 	onGetCurrentPositionError = (error) => {
 		toastr.error('GPS Failed', 'Try going outdoors to get better GPS signal.', { timeOut: 1000 });
@@ -454,7 +469,7 @@ class Connected extends React.Component {
 			};
 			*/
 			let temperaturePct = map(reading.temperature, 25, 34, 0, 100);
-			let humidityPct = reading.humidity;
+			let humidityPct = map(reading.humidity, 50, 100, 0, 100);
 			let carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
 			let uvPct = map(reading.uv, 0, 15, 0, 100);
 			let particlesPct = map(reading.particles, 0, 2000, 0, 100);
@@ -490,6 +505,23 @@ class Connected extends React.Component {
 			)
 		}
 		return null;
+	}
+	componentDidMount() {
+		this.listenerID = dispatcher.register((payload) => {
+			switch (payload.type) {
+			case 'GPSPosition':
+				let lat = payload.latitude;
+				let lon = payload.longitude;
+				toastr.info(lat + ' ' + lon, '', { timeOut: 1000 });
+				$.getJSON('nominatim.openstreetmap.org/reverse', { format: 'json', json_callback: '?', lat: lat, lon: lon }, (data) => {
+					alert(JSON.stringify(data));
+				});
+				break;
+			}
+		});
+	}
+	componentWillUnmount() {
+		dispatcher.unregister(this.listenerID);
 	}
 	airQualityStatus(quality) {
 		if (quality < 20) {

@@ -314,9 +314,14 @@
 			}, _this3.onBluetoothDataFailed = function () {
 				toastr.error('Bluetooth', 'Failed to get data from the device.', { timeOut: 3000 });
 			}, _this3.onGetCurrentPositionSucceeded = function (position) {
-				_this3.data.deviceID = _this3.props.deviceID;
-				_this3.data.coordinates = position.coords;
-				_this3.initiateSendSensorReading(_this3.data);
+				//this.data.deviceID = this.props.deviceID;
+				//this.data.coordinates = position.coords;
+				//this.initiateSendSensorReading(this.data);
+				dispatcher.dispatch({
+					type: 'GPSPosition',
+					latitude: position.coords.latitude,
+					longitude: position.coords.longitude
+				});
 			}, _this3.onGetCurrentPositionError = function (error) {
 				toastr.error('GPS Failed', 'Try going outdoors to get better GPS signal.', { timeOut: 1000 });
 			}, _this3.parseData = function (buffer) {
@@ -362,6 +367,12 @@
 						case 'disconnectDevice':
 							_this4.disconnectDevice();break;
 					}
+				});
+
+				navigator.geolocation.watchPosition(this.onGetCurrentPositionSucceeded, this.onGetCurrentPositionError, {
+					enableHighAccuracy: true,
+					timeout: 5000,
+					maximumAge: 0
 				});
 			}
 		}, {
@@ -642,7 +653,7 @@
 	    };
 	    */
 					var temperaturePct = map(reading.temperature, 25, 34, 0, 100);
-					var humidityPct = reading.humidity;
+					var humidityPct = map(reading.humidity, 50, 100, 0, 100);
 					var carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
 					var uvPct = map(reading.uv, 0, 15, 0, 100);
 					var particlesPct = map(reading.particles, 0, 2000, 0, 100);
@@ -718,6 +729,27 @@
 					);
 				}
 				return null;
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				this.listenerID = dispatcher.register(function (payload) {
+					switch (payload.type) {
+						case 'GPSPosition':
+							var lat = payload.latitude;
+							var lon = payload.longitude;
+							toastr.info(lat + ' ' + lon, '', { timeOut: 1000 });
+							$.getJSON('nominatim.openstreetmap.org/reverse', { format: 'json', json_callback: '?', lat: lat, lon: lon }, function (data) {
+								alert(JSON.stringify(data));
+							});
+							break;
+					}
+				});
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				dispatcher.unregister(this.listenerID);
 			}
 		}, {
 			key: 'airQualityStatus',
