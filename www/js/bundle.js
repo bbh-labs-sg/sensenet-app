@@ -56,15 +56,15 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _classnames = __webpack_require__(163);
+	var _classnames = __webpack_require__(159);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _flux = __webpack_require__(159);
+	var _flux = __webpack_require__(160);
 
 	var _flux2 = _interopRequireDefault(_flux);
 
-	var _pusherJs = __webpack_require__(162);
+	var _pusherJs = __webpack_require__(163);
 
 	var _pusherJs2 = _interopRequireDefault(_pusherJs);
 
@@ -105,16 +105,6 @@
 			type: 'goto',
 			page: page
 		});
-	}
-
-	function norm(value, min, max) {
-		value = !!value ? value : 0;
-		if (value < min) {
-			value = min;
-		} else if (value > max) {
-			value = max;
-		}
-		return (value - min) / (max - min);
 	}
 
 	function map(value, min1, max1, min2, max2) {
@@ -223,11 +213,6 @@
 				bluetoothSerial.isConnected(function () {
 					bluetoothSerial.disconnect(_this3.onBluetoothDisconnectSucceeded, _this3.onBluetoothDisconnectFailed);
 				}, function () {});
-			}, _this3.initiateSendSensorReading = function (data) {
-				dispatcher.dispatch({
-					type: 'sendSensorReading',
-					data: data
-				});
 			}, _this3.onBluetoothEnabled = function () {
 				var state = _this3.props.deviceState;
 				if (state == STATE_NOT_CONNECTED) {
@@ -287,14 +272,16 @@
 				// Have to multiply by two to convert int16 index to int8 index
 				while ((end - start) * 2 >= 28) {
 					var workBuffer = sensorDataBuffer.slice(start * 2, end * 2);
-					reading = _this3.parseData(workBuffer);
+					reading = _this3.parseReading(workBuffer);
 
 					start = end + 1;
 					end = indexOf(indexArray, 0x0A0D, start);
 				}
 
-				if (reading) {
-					_this3.sendData(reading);
+				if (reading && _this3.latitude && _this3.longitude) {
+					reading.latitude = _this3.latitude;
+					reading.longitude = _this3.longitude;
+					_this3.initiateSendSensorReading(reading);
 				}
 
 				var leftoverStart = end >= 0 ? end * 2 : start * 2;
@@ -314,37 +301,30 @@
 			}, _this3.onBluetoothDataFailed = function () {
 				toastr.error('Bluetooth', 'Failed to get data from the device.', { timeOut: 3000 });
 			}, _this3.onGetCurrentPositionSucceeded = function (position) {
-				//this.data.deviceID = this.props.deviceID;
-				//this.data.coordinates = position.coords;
-				//this.initiateSendSensorReading(this.data);
-				dispatcher.dispatch({
-					type: 'GPSPosition',
-					latitude: position.coords.latitude,
-					longitude: position.coords.longitude
-				});
+				_this3.latitude = position.coords.latitude;
+				_this3.longitude = position.coords.longitude;
 			}, _this3.onGetCurrentPositionError = function (error) {
 				toastr.error('GPS Failed', 'Try going outdoors to get better GPS signal.', { timeOut: 1000 });
-			}, _this3.parseData = function (buffer) {
+			}, _this3.parseReading = function (buffer) {
 				// Device ID
 				var deviceID = String.fromCharCode.apply(null, new Uint8Array(buffer, 0, 10));
-
-				// Float values
-				// ------------
-				// values[0] => Temperature
-				// values[1] => Humidity
-				// values[2] => UV
-				// values[3] => Particles
-				var values = new Float32Array(buffer.slice(10, 26));
 
 				// Carbon Monoxide		
 				var carbonMonoxide = new Int16Array(buffer, 26, 1);
 
+				// Other sensor values
+				var values = new Float32Array(buffer.slice(10, 26));
+				var temperature = values[0];
+				var humidity = values[1];
+				var uv = values[2];
+				var particles = values[3];
+
 				return {
 					deviceID: deviceID,
-					temperature: values[0],
-					humidity: values[1],
-					uv: values[2],
-					particles: values[3],
+					temperature: temperature,
+					humidity: humidity,
+					uv: uv,
+					particles: particles,
 					carbonMonoxide: carbonMonoxide[0]
 				};
 			}, _temp2), _possibleConstructorReturn(_this3, _ret2);
@@ -387,8 +367,8 @@
 			key: 'onResume',
 			value: function onResume() {}
 		}, {
-			key: 'sendData',
-			value: function sendData(reading) {
+			key: 'initiateSendSensorReading',
+			value: function initiateSendSensorReading(reading) {
 				dispatcher.dispatch({
 					type: 'sensorReading',
 					reading: {
@@ -397,7 +377,9 @@
 						humidity: reading.humidity,
 						uv: reading.uv,
 						particles: reading.particles,
-						carbonMonoxide: reading.carbonMonoxide
+						carbonMonoxide: reading.carbonMonoxide,
+						latitude: reading.latitude,
+						longitude: reading.longitude
 					}
 				});
 			}
@@ -420,29 +402,20 @@
 				args[_key3] = arguments[_key3];
 			}
 
-			return _ret3 = (_temp3 = (_this5 = _possibleConstructorReturn(this, (_Object$getPrototypeO3 = Object.getPrototypeOf(NetworkManager)).call.apply(_Object$getPrototypeO3, [this].concat(args))), _this5), _this5.onPause = function () {}, _this5.onResume = function () {}, _this5.initiateSendSensorReading = function (data) {
-				// For real-time viewers
-				//this.sendSensorReadingRealtime(data);
-
-				// For permanent storage
-				//this.sendSensorReading(data);
-			}, _this5.postDummyData = function () {
-				var coordinates = {
-					latitude: 1.25 + Math.random() * 0.15,
-					longitude: 103.65 + Math.random() * 0.3
-				};
-
-				var data = {
+			return _ret3 = (_temp3 = (_this5 = _possibleConstructorReturn(this, (_Object$getPrototypeO3 = Object.getPrototypeOf(NetworkManager)).call.apply(_Object$getPrototypeO3, [this].concat(args))), _this5), _this5.onPause = function () {}, _this5.onResume = function () {}, _this5.postDummyReading = function () {
+				var reading = {
 					deviceID: '71GM9xi757',
 					temperature: 28 + Math.random() * 10,
 					humidity: Math.random() * 100,
 					uv: Math.random() * 15,
 					carbonMonoxide: Math.random() * 1024,
 					particles: Math.random() * 1024,
-					coordinates: coordinates
+					latitude: 1.25 + Math.random() * 0.15,
+					longitude: 103.65 + Math.random() * 0.3
 				};
 
-				_this5.initiateSendSensorReading(data);
+				_this5.sendSensorReading(reading);
+				_this5.sendSensorReadingRealtime(reading);
 			}, _temp3), _possibleConstructorReturn(_this5, _ret3);
 		}
 
@@ -457,26 +430,13 @@
 				var _this6 = this;
 
 				this.listenerID = dispatcher.register(function (payload) {
-					switch (payload) {
-						case 'sendSensorReading':
-							_this6.initiateSendSensorReading(payload.data);break;
+					switch (payload.type) {
+						case 'sensorReading':
+							_this6.sendSensorReading(payload.reading);
+							_this6.sendSensorReadingRealtime(payload.reading);
+							break;
 					}
 				});
-
-				//if (this.props.loggedIn) {
-				//	for (let i = 0; i < 100; i++) {
-				//		this.postDummyData();
-				//	}
-				//}
-			}
-		}, {
-			key: 'componentDidUpdate',
-			value: function componentDidUpdate() {
-				//if (this.props.loggedIn) {
-				//	for (let i = 0; i < 100; i++) {
-				//		this.postDummyData();
-				//	}
-				//}
 			}
 		}, {
 			key: 'componentWillUnmount',
@@ -485,24 +445,25 @@
 			}
 		}, {
 			key: 'sendSensorReading',
-			value: function sendSensorReading(data) {
-				if (!data) return;
+			value: function sendSensorReading(reading) {
+				if (!reading) return;
+
+				toastr.info('Sending reading..', '', { timeOut: 1000 });
 
 				$.ajax({
 					url: 'https://sensenet.bbh-labs.com.sg/reading',
 					method: 'POST',
-					data: data
+					data: reading
 				});
 			}
 		}, {
 			key: 'sendSensorReadingRealtime',
-			value: function sendSensorReadingRealtime(data) {
-				if (!data) return;
+			value: function sendSensorReadingRealtime(reading) {
+				if (!reading) return;
 
 				channel.trigger('client-reading', {
 					deviceID: deviceID,
-					data: data,
-					coordinates: coordinates
+					reading: reading
 				});
 			}
 		}, {
@@ -568,7 +529,8 @@
 
 				switch (this.state.page) {
 					case 'my-device':
-						page = _react2.default.createElement(MyDevice, { connected: this.props.connected, reading: this.props.reading });break;
+						page = _react2.default.createElement(MyDevice, { connected: this.props.connected, reading: this.props.reading });
+						break;
 				}
 
 				return page;
@@ -652,6 +614,7 @@
 	    	carbonMonoxide: 87,
 	    };
 	    */
+
 					var temperaturePct = map(reading.temperature, 25, 34, 0, 100);
 					var humidityPct = map(reading.humidity, 50, 100, 0, 100);
 					var carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
@@ -738,7 +701,6 @@
 						case 'GPSPosition':
 							var lat = payload.latitude;
 							var lon = payload.longitude;
-							toastr.info(lat + ' ' + lon, '', { timeOut: 1000 });
 							$.getJSON('nominatim.openstreetmap.org/reverse', { format: 'json', json_callback: '?', lat: lat, lon: lon }, function (data) {
 								alert(JSON.stringify(data));
 							});
@@ -20507,6 +20469,60 @@
 /* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
 	 * Copyright (c) 2014-2015, Facebook, Inc.
 	 * All rights reserved.
@@ -20516,11 +20532,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 
-	module.exports.Dispatcher = __webpack_require__(160);
+	module.exports.Dispatcher = __webpack_require__(161);
 
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20542,7 +20558,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var invariant = __webpack_require__(161);
+	var invariant = __webpack_require__(162);
 
 	var _prefix = 'ID_';
 
@@ -20757,7 +20773,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20812,7 +20828,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -24800,60 +24816,6 @@
 	return Pusher;
 	}));
 
-
-
-/***/ },
-/* 163 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
 
 
 /***/ }

@@ -31,16 +31,6 @@ function goto(page) {
 	});
 }
 
-function norm(value, min, max) {
-	value = !!value ? value : 0;
-	if (value < min) {
-		value = min;
-	} else if (value > max) {
-		value = max;
-	}
-	return (value - min) / (max - min);
-}
-
 function map(value, min1, max1, min2, max2) {
 	return (value - min1) / (max1 - min1) * (max2 - min2) - min2;
 }
@@ -143,12 +133,6 @@ class DeviceManager extends React.Component {
 			() => { }
 		);
 	};
-	initiateSendSensorReading = (data) => {
-		dispatcher.dispatch({
-			type: 'sendSensorReading',
-			data: data,
-		});
-	};
 	onBluetoothEnabled = () => {
 		let state = this.props.deviceState;
 		if (state == STATE_NOT_CONNECTED) {
@@ -224,14 +208,16 @@ class DeviceManager extends React.Component {
 		// Have to multiply by two to convert int16 index to int8 index
 		while ((end - start) * 2 >= 28) {
 			let workBuffer = sensorDataBuffer.slice(start * 2, end * 2);
-			reading = this.parseData(workBuffer);
+			reading = this.parseReading(workBuffer);
 
 			start = end + 1;
 			end = indexOf(indexArray, 0x0A0D, start);
 		}
 
-		if (reading) {
-			this.sendData(reading);
+		if (reading && this.latitude && this.longitude) {
+			reading.latitude = this.latitude;
+			reading.longitude = this.longitude;
+			this.initiateSendSensorReading(reading);
 		}
 
 		let leftoverStart = end >= 0 ? end * 2 : start * 2;
@@ -253,43 +239,36 @@ class DeviceManager extends React.Component {
 		toastr.error('Bluetooth', 'Failed to get data from the device.', { timeOut: 3000 });
 	};
 	onGetCurrentPositionSucceeded = (position) => {
-		//this.data.deviceID = this.props.deviceID;
-		//this.data.coordinates = position.coords;
-		//this.initiateSendSensorReading(this.data);
-		dispatcher.dispatch({
-			type: 'GPSPosition',
-			latitude: position.coords.latitude,
-			longitude: position.coords.longitude,
-		});
+		this.latitude = position.coords.latitude;
+		this.longitude = position.coords.longitude;
 	};
 	onGetCurrentPositionError = (error) => {
 		toastr.error('GPS Failed', 'Try going outdoors to get better GPS signal.', { timeOut: 1000 });
 	};
-	parseData = (buffer) => {
+	parseReading = (buffer) => {
 		// Device ID
 		let deviceID = String.fromCharCode.apply(null, new Uint8Array(buffer, 0, 10));
-
-		// Float values
-		// ------------
-		// values[0] => Temperature
-		// values[1] => Humidity
-		// values[2] => UV
-		// values[3] => Particles
-		let values = new Float32Array(buffer.slice(10, 26));
 
 		// Carbon Monoxide		
 		let carbonMonoxide = new Int16Array(buffer, 26, 1);
 
+		// Other sensor values
+		let values = new Float32Array(buffer.slice(10, 26));
+		let temperature = values[0];
+		let humidity = values[1];
+		let uv = values[2];
+		let particles = values[3];
+
 		return {
 			deviceID: deviceID,
-			temperature: values[0],
-			humidity: values[1],
-			uv: values[2],
-			particles: values[3],
+			temperature: temperature,
+			humidity: humidity,
+			uv: uv,
+			particles: particles,
 			carbonMonoxide: carbonMonoxide[0],
 		};
 	};
-	sendData(reading) {
+	initiateSendSensorReading(reading) {
 		dispatcher.dispatch({
 			type: 'sensorReading',
 			reading: {
@@ -299,6 +278,8 @@ class DeviceManager extends React.Component {
 				uv: reading.uv,
 				particles: reading.particles,
 				carbonMonoxide: reading.carbonMonoxide,
+				latitude: reading.latitude,
+				longitude: reading.longitude,
 			},
 		});
 	}
@@ -310,24 +291,13 @@ class NetworkManager extends React.Component {
 	}
 	componentDidMount() {
 		this.listenerID = dispatcher.register((payload) => {
-			switch (payload) {
-			case 'sendSensorReading':
-				this.initiateSendSensorReading(payload.data); break;
+			switch (payload.type) {
+			case 'sensorReading':
+				this.sendSensorReading(payload.reading);
+				this.sendSensorReadingRealtime(payload.reading);
+				break;
 			}
 		});
-
-		//if (this.props.loggedIn) {
-		//	for (let i = 0; i < 100; i++) {
-		//		this.postDummyData();
-		//	}
-		//}
-	}
-	componentDidUpdate() {
-		//if (this.props.loggedIn) {
-		//	for (let i = 0; i < 100; i++) {
-		//		this.postDummyData();
-		//	}
-		//}
 	}
 	componentWillUnmount() {
 		dispatcher.unregister(this.listenerID);
@@ -336,50 +306,41 @@ class NetworkManager extends React.Component {
 	};
 	onResume = () => {
 	};
-	initiateSendSensorReading = (data) => {
-		// For real-time viewers
-		//this.sendSensorReadingRealtime(data);
-
-		// For permanent storage
-		//this.sendSensorReading(data);
-	};
-	sendSensorReading(data) {
-		if (!data)
+	sendSensorReading(reading) {
+		if (!reading)
 			return;
+
+		toastr.info('Sending reading..', '', { timeOut: 1000 });
 
 		$.ajax({
 			url: 'https://sensenet.bbh-labs.com.sg/reading',
 			method: 'POST',
-			data: data,
+			data: reading,
 		});
 	}
-	sendSensorReadingRealtime(data) {
-		if (!data)
+	sendSensorReadingRealtime(reading) {
+		if (!reading)
 			return;
 
 		channel.trigger('client-reading', {
 			deviceID: deviceID,
-			data: data,
-			coordinates: coordinates,
+			reading: reading,
 		});
 	}
-	postDummyData = () => {
-		let coordinates = {
-			latitude: 1.25 + Math.random() * 0.15,
-			longitude: 103.65 + Math.random() * 0.3,
-		};
-
-		let data = {
+	postDummyReading = () => {
+		let reading = {
 			deviceID: '71GM9xi757',
 			temperature: 28 + Math.random() * 10,
 			humidity: Math.random() * 100,
 			uv: Math.random() * 15,
 			carbonMonoxide: Math.random() * 1024,
 			particles: Math.random() * 1024,
-			coordinates: coordinates,
+			latitude: 1.25 + Math.random() * 0.15,
+			longitude: 103.65 + Math.random() * 0.3,
 		};
 
-		this.initiateSendSensorReading(data);
+		this.sendSensorReading(reading);
+		this.sendSensorReadingRealtime(reading);
 	};
 	initPusher() {
 		pusher = new Pusher('ae0834efadeb12c41af8', {
@@ -417,7 +378,8 @@ class Dashboard extends React.Component {
 
 		switch (this.state.page) {
 		case 'my-device':
-			page = <MyDevice connected={ this.props.connected } reading={ this.props.reading } />; break;
+			page = <MyDevice connected={ this.props.connected } reading={ this.props.reading } />;
+			break;
 		}
 
 		return page;
@@ -468,6 +430,7 @@ class Connected extends React.Component {
 				carbonMonoxide: 87,
 			};
 			*/
+
 			let temperaturePct = map(reading.temperature, 25, 34, 0, 100);
 			let humidityPct = map(reading.humidity, 50, 100, 0, 100);
 			let carbonMonoxidePct = map(reading.carbonMonoxide, 0, 1024, 0, 100);
@@ -512,7 +475,6 @@ class Connected extends React.Component {
 			case 'GPSPosition':
 				let lat = payload.latitude;
 				let lon = payload.longitude;
-				toastr.info(lat + ' ' + lon, '', { timeOut: 1000 });
 				$.getJSON('nominatim.openstreetmap.org/reverse', { format: 'json', json_callback: '?', lat: lat, lon: lon }, (data) => {
 					alert(JSON.stringify(data));
 				});
