@@ -54,13 +54,6 @@ var STATE_NOT_CONNECTED = 0,
 
 var LOOK_FOR_DEVICE_INTERVAL = 5000;
 
-function goto(page) {
-	dispatcher.dispatch({
-		type: 'goto',
-		page: page
-	});
-}
-
 function map(value, min1, max1, min2, max2) {
 	return (value - min1) / (max1 - min1) * (max2 - min2) - min2;
 }
@@ -110,9 +103,9 @@ var App = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				{ id: 'app', className: 'flex column one' },
-				_react2.default.createElement(Dashboard, { reading: this.state.reading, connected: connected }),
+				_react2.default.createElement(MyDevice, { reading: this.state.reading, connected: connected }),
 				_react2.default.createElement(DeviceManager, { ref: 'deviceManager', deviceID: this.state.deviceID, deviceState: this.state.deviceState }),
-				_react2.default.createElement(NetworkManager, { ref: 'networkManager' })
+				_react2.default.createElement(NetworkManager, { ref: 'networkManager', reading: this.state.reading })
 			);
 		}
 	}, {
@@ -122,14 +115,8 @@ var App = function (_React$Component) {
 
 			this.listenerID = dispatcher.register(function (payload) {
 				switch (payload.type) {
-					case 'reloadCurrentUser':
-						_this2.reloadCurrentUser();
-						break;
 					case 'sensorReading':
 						_this2.setState({ reading: payload.reading });
-						break;
-					case 'deviceID':
-						_this2.setState({ deviceID: payload.deviceID });
 						break;
 					case 'deviceState':
 						_this2.setState({ deviceState: payload.deviceState });
@@ -379,23 +366,10 @@ var NetworkManager = function (_React$Component3) {
 			return null;
 		}
 	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			var _this6 = this;
-
-			this.listenerID = dispatcher.register(function (payload) {
-				switch (payload.type) {
-					case 'sensorReading':
-						_this6.sendSensorReading(payload.reading);
-						_this6.sendSensorReadingRealtime(payload.reading);
-						break;
-				}
-			});
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			dispatcher.unregister(this.listenerID);
+		key: 'componentDidUpdate',
+		value: function componentDidUpdate() {
+			this.sendSensorReading(this.props.reading);
+			this.sendSensorReadingRealtime(this.props.reading);
 		}
 	}, {
 		key: 'sendSensorReading',
@@ -457,62 +431,8 @@ var NetworkManager = function (_React$Component3) {
 	return NetworkManager;
 }(_react2.default.Component);
 
-var Dashboard = function (_React$Component4) {
-	_inherits(Dashboard, _React$Component4);
-
-	function Dashboard() {
-		var _Object$getPrototypeO4;
-
-		var _temp4, _this7, _ret4;
-
-		_classCallCheck(this, Dashboard);
-
-		for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-			args[_key4] = arguments[_key4];
-		}
-
-		return _ret4 = (_temp4 = (_this7 = _possibleConstructorReturn(this, (_Object$getPrototypeO4 = Object.getPrototypeOf(Dashboard)).call.apply(_Object$getPrototypeO4, [this].concat(args))), _this7), _this7.state = {
-			page: 'my-device'
-		}, _temp4), _possibleConstructorReturn(_this7, _ret4);
-	}
-
-	_createClass(Dashboard, [{
-		key: 'render',
-		value: function render() {
-			var page = null;
-
-			switch (this.state.page) {
-				case 'my-device':
-					page = _react2.default.createElement(MyDevice, { connected: this.props.connected, reading: this.props.reading });
-					break;
-			}
-
-			return page;
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			var _this8 = this;
-
-			this.listenerID = dispatcher.register(function (payload) {
-				switch (payload.type) {
-					case 'goto':
-						_this8.setState({ page: payload.page });break;
-				}
-			});
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			dispatcher.unregister(this.listenerID);
-		}
-	}]);
-
-	return Dashboard;
-}(_react2.default.Component);
-
-var MyDevice = function (_React$Component5) {
-	_inherits(MyDevice, _React$Component5);
+var MyDevice = function (_React$Component4) {
+	_inherits(MyDevice, _React$Component4);
 
 	function MyDevice() {
 		_classCallCheck(this, MyDevice);
@@ -545,8 +465,8 @@ var MyDevice = function (_React$Component5) {
 	return MyDevice;
 }(_react2.default.Component);
 
-var Connected = function (_React$Component6) {
-	_inherits(Connected, _React$Component6);
+var Connected = function (_React$Component5) {
+	_inherits(Connected, _React$Component5);
 
 	function Connected() {
 		_classCallCheck(this, Connected);
@@ -645,7 +565,11 @@ var Connected = function (_React$Component6) {
 					)
 				);
 			}
-			return null;
+			return _react2.default.createElement(
+				'div',
+				null,
+				'No reading!'
+			);
 		}
 	}, {
 		key: 'componentDidMount',
@@ -707,22 +631,22 @@ var Connected = function (_React$Component6) {
 	return Connected;
 }(_react2.default.Component);
 
-var Sensor = function (_React$Component7) {
-	_inherits(Sensor, _React$Component7);
+var Sensor = function (_React$Component6) {
+	_inherits(Sensor, _React$Component6);
 
 	function Sensor() {
-		var _Object$getPrototypeO5;
+		var _Object$getPrototypeO4;
 
-		var _temp5, _this11, _ret5;
+		var _temp4, _this8, _ret4;
 
 		_classCallCheck(this, Sensor);
 
-		for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-			args[_key5] = arguments[_key5];
+		for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+			args[_key4] = arguments[_key4];
 		}
 
-		return _ret5 = (_temp5 = (_this11 = _possibleConstructorReturn(this, (_Object$getPrototypeO5 = Object.getPrototypeOf(Sensor)).call.apply(_Object$getPrototypeO5, [this].concat(args))), _this11), _this11.barLabel = function () {
-			var percentage = _this11.props.percentage;
+		return _ret4 = (_temp4 = (_this8 = _possibleConstructorReturn(this, (_Object$getPrototypeO4 = Object.getPrototypeOf(Sensor)).call.apply(_Object$getPrototypeO4, [this].concat(args))), _this8), _this8.barLabel = function () {
+			var percentage = _this8.props.percentage;
 			if (percentage < 20) {
 				return 'very-low';
 			} else if (percentage < 40) {
@@ -734,7 +658,7 @@ var Sensor = function (_React$Component7) {
 			} else {
 				return 'very-high';
 			}
-		}, _temp5), _possibleConstructorReturn(_this11, _ret5);
+		}, _temp4), _possibleConstructorReturn(_this8, _ret4);
 	}
 
 	_createClass(Sensor, [{
@@ -765,8 +689,8 @@ var Sensor = function (_React$Component7) {
 	return Sensor;
 }(_react2.default.Component);
 
-var Disconnected = function (_React$Component8) {
-	_inherits(Disconnected, _React$Component8);
+var Disconnected = function (_React$Component7) {
+	_inherits(Disconnected, _React$Component7);
 
 	function Disconnected() {
 		_classCallCheck(this, Disconnected);

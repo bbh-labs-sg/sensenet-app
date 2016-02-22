@@ -24,13 +24,6 @@ const STATE_NOT_CONNECTED	= 0,
 
 const LOOK_FOR_DEVICE_INTERVAL = 5000;
 
-function goto(page) {
-	dispatcher.dispatch({
-		type: 'goto',
-		page: page,
-	});
-}
-
 function map(value, min1, max1, min2, max2) {
 	return (value - min1) / (max1 - min1) * (max2 - min2) - min2;
 }
@@ -49,9 +42,9 @@ class App extends React.Component {
 		let connected = this.state.deviceState == STATE_CONNECTED;
 		return (
 			<div id='app' className='flex column one'>
-				<Dashboard reading={ this.state.reading } connected={ connected } />
+				<MyDevice reading={ this.state.reading } connected={ connected } />
 				<DeviceManager ref='deviceManager' deviceID={ this.state.deviceID } deviceState={ this.state.deviceState } />
-				<NetworkManager ref='networkManager' />
+				<NetworkManager ref='networkManager' reading={ this.state.reading } />
 			</div>
 		)
 	}
@@ -63,14 +56,8 @@ class App extends React.Component {
 	componentDidMount() {
 		this.listenerID = dispatcher.register((payload) => {
 			switch (payload.type) {
-			case 'reloadCurrentUser':
-				this.reloadCurrentUser();
-				break;
 			case 'sensorReading':
 				this.setState({ reading: payload.reading });
-				break;
-			case 'deviceID':
-				this.setState({ deviceID: payload.deviceID });
 				break;
 			case 'deviceState':
 				this.setState({ deviceState: payload.deviceState });
@@ -289,18 +276,9 @@ class NetworkManager extends React.Component {
 	render() {
 		return null;
 	}
-	componentDidMount() {
-		this.listenerID = dispatcher.register((payload) => {
-			switch (payload.type) {
-			case 'sensorReading':
-				this.sendSensorReading(payload.reading);
-				this.sendSensorReadingRealtime(payload.reading);
-				break;
-			}
-		});
-	}
-	componentWillUnmount() {
-		dispatcher.unregister(this.listenerID);
+	componentDidUpdate() {
+		this.sendSensorReading(this.props.reading);
+		this.sendSensorReadingRealtime(this.props.reading);
 	}
 	onPause = () => {
 	};
@@ -372,34 +350,6 @@ class NetworkManager extends React.Component {
 	}
 }
 
-class Dashboard extends React.Component {
-	render() {
-		let page = null;
-
-		switch (this.state.page) {
-		case 'my-device':
-			page = <MyDevice connected={ this.props.connected } reading={ this.props.reading } />;
-			break;
-		}
-
-		return page;
-	}
-	state = {
-		page: 'my-device',
-	};
-	componentDidMount() {
-		this.listenerID = dispatcher.register((payload) => {
-			switch (payload.type) {
-			case 'goto':
-				this.setState({ page: payload.page }); break;
-			}
-		});
-	}
-	componentWillUnmount() {
-		dispatcher.unregister(this.listenerID);
-	}
-}
-
 class MyDevice extends React.Component {
 	render() {
 		let connected = this.props.connected;
@@ -467,7 +417,7 @@ class Connected extends React.Component {
 				</div>
 			)
 		}
-		return null;
+		return <div>No reading!</div>;
 	}
 	componentDidMount() {
 		this.listenerID = dispatcher.register((payload) => {
