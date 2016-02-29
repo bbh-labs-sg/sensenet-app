@@ -394,7 +394,7 @@ class Connected extends React.Component {
 							<hr className='line flex one' /><p className='location-title'>LOCATION</p><hr className='line flex one' />
 						</div>
 						<div className='flex row one align-center justify-center'>
-							<h3 className='location'>5 MAGAZINE ROAD</h3>
+							<h3 className='location'>{ reading.latitude }, { reading.longitude }</h3>
 						</div>
 					</div>
 					<div className='flex column two align-center justify-center'>
